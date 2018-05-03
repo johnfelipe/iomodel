@@ -2,12 +2,16 @@
 
 ![Screenshot](https://github.com/twintechlabs/iomodel/blob/master/app/static/images/screenshot.png)
 
-This is the core code base of ioModel.
+This is the core code base of the ioModel Research Platform. Essentially, ioModel provides a UI and
+an intuitive workflow on top of a number of common open source machine learning libraries including
+Apple's Turi Create, NumPy, ScyPi, and Scikit Learn.
 
-It's based on the awesome work of the Ling Thio and includes the open source
-CoreUI admin BootStrap theme and a number of enhancements to the base Flask
-Starter app including adding basic user management and a separate view file for
-API code.
+Today - ioModel allows you to import your data via CSV, analyze and transform the data, train machine
+learning models (classifiers and predictors currently supported), evaluate their performance, and 
+manage them as a deployed RESTful endpoint for integration into other systems.
+
+Read more about it in the primer located here:
+http://twintechlabs.io/Twin%20Tech%20Labs%20Primer.pdf
 
 ## Code characteristics
 
@@ -92,7 +96,13 @@ If you make changes in the Models and run into DB schema issues, delete the sqli
 
 ## Acknowledgements
 
-With thanks to the following Flask extensions:
+With thanks to the following libraries - we all build on the shoulder's of giants:
+* [Apple's Turi Create](https://github.com/apple/turicreate)
+* [NumPy](http://www.numpy.org/)
+* [ScyPi](https://www.scipy.org/)
+* [scikit-learn](http://scikit-learn.org/stable/)
+* [Pandas](https://pandas.pydata.org/)
+* [FlaskDash](https://github.com/twintechlabs/flaskdash)
 * [CoreUI](https://coreui.io/)
 * [Alembic](http://alembic.zzzcomputing.com/)
 * [Flask](http://flask.pocoo.org/)
@@ -101,9 +111,5 @@ With thanks to the following Flask extensions:
 * [Flask-Script](https://flask-script.readthedocs.io/)
 * [Flask-User](http://flask-user.readthedocs.io/en/v0.6/)
 
-<!-- Please consider leaving this line. Thank you -->
-[Flask-User-starter-app](https://github.com/lingthio/Flask-User-starter-app) was used as a starting point for this code repository.
-
 ## Authors
 - Matt Hogan - matt AT twintechlabs DOT io
-- Ling Thio -- ling.thio AT gmail DOT com
