@@ -1,0 +1,49 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }}>Transforms</a></li>
+  <li class="breadcrumb-item active">Rename Feature</li>
+</ol>
+
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+        <form action="" id="form" method="POST" class="form" role="form">
+          <div class="card-header ">
+            <strong>Rename a feature to something else</strong>
+          </div>
+          <div class="card-body ">
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="data_id" value="{{my_data.id}}">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" placeholder="Enter a name for the new data set">
+            </div>
+            <div class="form-group">
+              <label for="target">Select a Features</label>
+              <select class="form-control" required="true" id="target" name="target">
+                {% for x in range(0, names.__len__()) %}
+                <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="magic">New Feature Name</label>
+              <input type="text" required="true" class="form-control" id="feature_name" name="feature_name" aria-describedby="name" placeholder="Give this feature a new name">
+            </div>
+          </div>
+          <div class="card-footer ">
+            <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Transforming Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Transform</button>                 
+            <a class="btn btn-sm btn-danger" href="{{ url_for('transforms.transform_page', data_id=my_data.id) }}"><i class="fa fa-ban "></i> Cancel</a>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+{% endblock %}

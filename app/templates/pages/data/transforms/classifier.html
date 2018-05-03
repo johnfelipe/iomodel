@@ -1,0 +1,78 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }}>Transforms</a></li>
+  <li class="breadcrumb-item active">Bounded Classifier</li>
+</ol>
+
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+        <form action="" id="form" method="POST" class="form" role="form">
+          <div class="card-header ">
+            <strong>Classifiy data based on numeric ranges</strong>
+          </div>
+          <div class="card-body ">
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="data_id" value="{{my_data.id}}">
+                <input type="hidden" name="num_brackets" id="num_brackets" value="1">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" placeholder="Enter a name for the new data set">
+                </div>
+                <div class="form-group">
+                  <label for="target">Select a Target</label>
+                  <select class="form-control" id="target" required name="target">
+                    <option value="">--- Select a field to transform ---</option>
+                  {% for x in range(0, cols.__len__()) %}
+                    <option value="{{cols[x]}}">{{cols[x]}} ({{types[x].__name__}})</option>
+                  {% endfor %}
+                  </select>
+                </div>         
+                <div class="form-group">
+                  <label for="name">Field Name</label>
+                  <input type="text" required="true" class="form-control" id="field" name="field" aria-describedby="name" placeholder="What should we call the new field?">
+                </div>                       
+                <div id="fields">
+                    <div class="form-row">
+                        <label class="control-label col-sm-1" for="lrange_1">Range:*</label>
+                        <div class="col-sm-2">
+                            <input type="number" class="form-control" id="lrange_1" name="lrange_1" required="true" placeholder="Enter a lower bound">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="number" class="form-control" id="urange_1" name="urange_1" required="true" placeholder="Enter an upper bound">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="class_1" name="class_1" required="true" placeholder="Enter a class name">
+                        </div>
+                    </div>
+                </div>   
+          </div>
+       
+          <div class="card-footer ">
+            <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Transforming Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Transform</button>        
+            <button type="button" class="btn btn-sm btn-info" onClick="addInput('fields');">Add Bracket</button>         
+            <a class="btn btn-sm btn-danger" href="{{ url_for('transforms.transform_page', data_id=my_data.id) }}"><i class="fa fa-ban "></i> Cancel</a>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+<script>
+var counter = 1;
+function addInput(divName){
+    counter++;
+    var newdiv = document.createElement('div');
+    newdiv.innerHTML = '<div class="form-row"> <label class="control-label col-sm-1" for="range_'+counter+'">Range:*</label> <div class="col-sm-2"> <input type="number" class="form-control" id="lrange_'+counter+'" name="lrange_'+counter+'" required="true" placeholder="Enter a lower bound"> </div> <div class="col-sm-2"><input type="number" class="form-control" id="urange_'+counter+'" name="urange_'+counter+'" required="true" placeholder="Enter an upper bound"></div><div class="col-sm-2"><input type="text" class="form-control" id="class_'+counter+'" name="class_'+counter+'" required="true" placeholder="Enter a class name"></div></div>';
+    document.getElementById(divName).appendChild(newdiv);
+    document.getElementById("num_brackets").value=counter;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('data.data_details_page', data_id=my_data.id) }}>{{my_data.name}}</a></li>
+  <li class="breadcrumb-item active">Data Visualization</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="card ">
+      <div class="card-header ">
+        <strong>Data Visualization: {{my_data.name}} ({{col_name}})</strong>
+      </div>
+      <div class="card-body ">
+        <p>Description: {{my_data.description}}</p>
+        <div class="row">
+            <div class="col-lg-6">
+              <div class="card ">
+                  <div class="card-header ">
+                    <strong>Box and Whiskers</strong>
+                  </div>
+                  <div class="card-body ">
+                    <div id="container" style="height: 400px; margin: auto; max-width: 600px"></div>                                  
+                  </div>
+                  <div class="card-footer "></div>
+              </div>
+            </div>
+            {% if dtype != 'str' %}
+            <div class="col-lg-6">
+              <div class="card ">
+                  <div class="card-header ">
+                    <strong>Data Distribution</strong>
+                  </div>
+                  <div class="card-body ">
+                    <div id="container5" style="height: 400px; margin: auto; max-width: 600px"></div>                                 
+                  </div>
+                  <div class="card-footer "></div>
+              </div>
+            </div>    
+            {% endif %}        
+          </div>
+        </div>
+      <div class="card-footer "></div>
+    </div>
+`</div>
+</div>
+
+<script>
+{% if dtype != 'str' %}
+
+Highcharts.chart('container5', {
+    title: {
+        text: '{{col_name}} Histogram'
+    },
+    credits: {
+        enabled: false
+    },
+    xAxis: [{
+        title: { text: 'Bin' },
+        alignTicks: false
+    }, {
+        title: { text: 'Range' },
+        alignTicks: false,
+        opposite: true
+    }],
+
+    yAxis: [{
+        title: { text: 'Count' }
+    }, {
+        title: { text: '{{col_name}}' },
+        opposite: true
+    }],
+
+    series: [{
+        name: 'Bins',
+        type: 'histogram',
+        xAxis: 1,
+        yAxis: 1,
+        baseSeries: 's1',
+        zIndex: -1
+    }, {
+        name: 'Scores',
+        type: 'scatter',
+        data: {{results | safe}},
+        id: 's1',
+        marker: {
+            radius: 1.5
+        }
+    }]
+});
+
+Highcharts.chart('container', {
+
+    chart: {
+        type: 'boxplot'
+    },
+    credits: {
+        enabled: false
+    },
+
+    title: {
+        text: 'Box Plot'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    xAxis: {
+        categories: ['1'],
+        title: {
+            text: '{{col_name}}'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'Observations'
+        }
+    },
+
+    series: [{
+        name: 'Observations',
+        data: [
+            [{{to_render["min"]}}, {{to_render["lower"]}}, {{to_render["median"]}}, {{to_render["upper"]}}, {{to_render["max"]}}]
+        ],
+        tooltip: {
+            headerFormat: '<em>Experiment No {point.key}</em><br/>'
+        }
+    }, {
+        name: 'Outlier',
+        color: Highcharts.getOptions().colors[0],
+        type: 'scatter',
+        data: {{to_render["outliers"] | safe}},
+        marker: {
+            fillColor: 'white',
+            lineWidth: 1,
+            lineColor: Highcharts.getOptions().colors[0]
+        },
+        tooltip: {
+            pointFormat: 'Observation: {point.y}'
+        }
+    }]
+
+});
+{% else %}
+var text = '{{to_render["words"]}}';
+var lines = text.split(/[,\.~]+/g),
+    data = Highcharts.reduce(lines, function (arr, word) {
+        var obj = Highcharts.find(arr, function (obj) {
+            return obj.name === word;
+        });
+        if (obj) {
+            obj.weight += 1;
+        } else {
+            obj = {
+                name: word,
+                weight: 1
+            };
+            arr.push(obj);
+        }
+        return arr;
+    }, []);
+
+Highcharts.chart('container', {
+    series: [{
+        type: 'wordcloud',
+        data: data,
+        name: 'Occurrences'
+    }],
+    title: {
+        text: '{{col_name}}'
+    },
+    credits: {
+        enabled: false
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

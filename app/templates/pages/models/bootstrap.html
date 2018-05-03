@@ -1,0 +1,121 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('data.data_details_page', data_id=my_data.id) }}">{{my_data.name}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('model.model_details_page', model_id=my_model.id) }}">{{my_model.name}}</a></li>
+    <li class="breadcrumb-item active">Bootstrap Confidence</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="card ">
+            <div class="card-header">
+              <strong>Bootstrap Confidence Intervals: {{my_model.name}}</strong>
+            </div>
+            <div class="card-body">
+              <div class="card ">
+                  <div class="card-header">
+                      <strong>Performance Summary</strong>
+                  </div>
+                  <div class="card-body">
+                      <table class="table table-hover table-striped table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Interval</th>
+                            <th>Lower</th>
+                            <th>Upper</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>99% Confidence</td>
+                            <td>{{to_render['bootstrap_confidence_99_lower'] | round(4)}}</td>
+                            <td>{{to_render['bootstrap_confidence_99_upper'] | round(4)}}</td>
+                          </tr>
+                          <tr>
+                            <td>95% Confidence</td>
+                            <td>{{to_render['bootstrap_confidence_95_lower'] | round(4)}}</td>
+                            <td>{{to_render['bootstrap_confidence_95_upper'] | round(4)}}</td>
+                          </tr>
+                          <tr>
+                            <td>90% Confidence</td>
+                            <td>{{to_render['bootstrap_confidence_90_lower'] | round(4)}}</td>
+                            <td>{{to_render['bootstrap_confidence_90_upper'] | round(4)}}</td>
+                          </tr>
+                          <tr>
+                            <td>85% Confidence</td>
+                            <td>{{to_render['bootstrap_confidence_85_lower'] | round(4)}}</td>
+                            <td>{{to_render['bootstrap_confidence_85_upper'] | round(4)}}</td>
+                          </tr>
+                          <tr>
+                            <td>80% Confidence</td>
+                            <td>{{to_render['bootstrap_confidence_80_lower'] | round(4)}}</td>
+                            <td>{{to_render['bootstrap_confidence_80_upper'] | round(4)}}</td>
+                          </tr>
+                        </tbody>
+                      </table>                    
+                  </div>
+                  <div class="card-footer "></div>
+              </div>    
+              <div class="card ">
+                  <div class="card-header">
+                      <strong></strong>
+                  </div>
+                  <div class="card-body">
+                    <div id="container5" style="height: 400px; margin: 0 auto"></div>
+                  </div>
+                  <div class="card-footer "></div>
+              </div>                                                
+          </div>
+          <div class="card-footer "></div>
+      </div>
+    </div>
+</div>
+
+<script>
+Highcharts.chart('container5', {
+    title: {
+        text: 'Bootstrap Sample Variance'
+    },
+    credits: {
+        enabled: false
+    },
+    xAxis: [{
+        title: { text: 'Range' },
+        alignTicks: false
+    }, {
+        title: { text: 'Iteration' },
+        alignTicks: false,
+        opposite: true
+    }],
+
+    yAxis: [{
+        title: { text: 'Variance' }
+    }, {
+        title: { text: 'Counts' },
+        opposite: true
+    }],
+
+    series: [{
+        name: 'Variance Range',
+        type: 'histogram',
+        xAxis: 1,
+        yAxis: 1,
+        baseSeries: 's1',
+        zIndex: -1
+    }, {
+        name: 'Variance by Iteration',
+        type: 'scatter',
+        data: {{variance | safe}},
+        id: 's1',
+        marker: {
+            radius: 1.5
+        }
+    }]
+});
+</script>
+{% endblock %}

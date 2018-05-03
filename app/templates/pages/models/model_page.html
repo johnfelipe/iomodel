@@ -1,0 +1,49 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<div class="theme-docs-wrapper" style="margin-top: 20px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="mt-4">My Models</h4>
+                <div class="panel">
+                     <div class="panel-body" style="padding-bottom: 20px;">
+                      <table class="table table-hover table-striped">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th class="d-none d-lg-table-cell">Type</th>
+                            <th class="d-none d-lg-table-cell">Created</th>
+                            <th class="d-none d-lg-table-cell">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for model in my_models %}
+                          <tr>
+                            <td><a href="{{ url_for('model.model_details_page', model_id=model.id) }}">{{model.name}}</a></td>
+                            <td>{{model.features['model_class']}}</td>
+                            <td class="d-none d-lg-table-cell">{{model.features['model_type']}}</td>
+                            <td class="d-none d-lg-table-cell">{{model.created_at}}</td>
+                            <tD class="d-none d-lg-table-cell"><a href="{{ url_for('model.delete_model_page', model_id=model.id) }}"><i class="fa fa-remove"></i></a></tD>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><Br>
+    {% if my_models|length < 2 %}
+    <br><br><Br><br><br><Br><br><br>
+    {% endif %}
+    {% if my_models|length < 4 %}
+    <br><br>
+    {% endif %}
+</div>
+
+
+{% endblock %}

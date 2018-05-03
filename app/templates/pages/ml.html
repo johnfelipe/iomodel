@@ -1,0 +1,126 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item">Documentation</li>
+  <li class="breadcrumb-item active">About Machine Learning</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+      <div class="row">
+        <div class="col-md-4 d-none d-md-block" >
+          <div class="support-topic-sidebar"  style="background-color: #FFF; padding: 20px; box-shadow: rgba(23, 43, 99, 0.15) 0 7px 28px;">
+            <h4>
+              About Machine Learning
+            </h4>
+            <a href="#intro" class="related-link">
+              Introduction
+            </a><Br>
+            <a href="#super" class="related-link">
+              Supervised Learning
+            </a><Br>
+            <a href="#methods" class="related-link">
+              Classifiers vs. Predictors
+            </a><Br>
+            <a href="#supported" class="related-link">
+              Supported Algorithms
+            </a><Br>
+            <a href="#eval" class="related-link">
+              Model Evaluation
+            </a>
+          </div>
+        </div>
+        <div class="col-md-8" style="background-color: #FFF; padding: 20px; box-shadow: rgba(23, 43, 99, 0.15) 0 7px 28px;">
+          <div class="support-topic-body">
+            
+            <h3 class="topic-title" >
+              <a name="intro">Introduction<a>
+            </h3>
+
+            <p>
+              If Data Science is an offshoot of statistics, machine learning is born of engineering and computer science. It is a branch of artificial intelligence that automates the creation of complex models by providing examples of data from which computer algorithms can learn. The models you create with machine learning are similar to models you might create using a technique like multiple linear regression in statistics. In many cases, those same statistical methods underpin the more complex techniques used in machine learning.
+            </p>
+            <p>
+              In statistics, a target is called a dependent variable.  Variables (as they are known in statistics) are called features in machine learning. ioModel blends the terminology and provides features such as automated coefficient of correlation analysis to improve your work flow.  You'll see descriptive statistics front and center along side some more specific machine learning terminology. ioModel leverages the best of both worlds.
+            </p>
+            <h5>Additional Reading: <a href="https://medium.com/machine-learning-for-humans/why-machine-learning-matters-6164faf1df12">Machine Learning Primer</a></h5>
+
+            <h3 class="topic-title">
+              <a name="ml">Supervised Learning</a>
+            </h3>
+
+            <p>
+              ioModel has support for supervised learning. That is, a data set that contains a vector of features and a target value (either discrete or continuous values) is used to create a mathematical/algorithmic model that can be used to predict unknown target values.
+            </p>
+            <h5>Additional Reading: <a href="https://en.wikipedia.org/wiki/Supervised_learning">Supervised Learning</a></h5>
+
+            <h3 class="topic-title">
+              <a name="diff">Classifier vs. Predictor</a>
+            </h3>
+
+            <p>
+              Classifiers (or classification models), predict either nominal or categorical class labels based on training data. Predictive models (or predictors) are often forms for regression functions and predict continuous values.
+            </p>
+            <p>
+              The distinction is important as both are measured for accuracy and performance differently.
+            </p>       
+            <h5>Additional Reading: <a href="http://scikit-learn.org/stable/modules/model_evaluation.html">Model Evaluation</a></h5>
+
+            
+            <h3 class="topic-title">
+              <a name="supported">Supported Algorithms</a>
+            </h3>
+
+            <p>
+              For classifiers, ioModel supports the following techniques:
+            </p>
+            <ul>
+              <li>Gradient Boosting (<a href="http://blog.kaggle.com/2017/01/23/a-kaggle-master-explains-gradient-boosting/">learn more</a>)</li>
+              <li>Multiple Linear Regression (<a href="http://www.stat.yale.edu/Courses/1997-98/101/linmult.htm">learn more</a>)</li>
+              <li>Support Vector Machine (<a href="https://medium.com/machine-learning-101/chapter-2-svm-support-vector-machine-theory-f0812effc72">learn more</a>)</li>
+              <li>Decision Tree (<a href="https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567">learn more</a>)</li>
+              <li>Random Forest (<a href="https://medium.com/@Synced/how-random-forest-algorithm-works-in-machine-learning-3c0fe15b6674">learn more</a>)</li>
+            </ul>
+            <p>
+              For predictors, ioModel supports the following techniques:
+            </p>
+            <ul>
+              <li>Gradient Boosting (<a href="http://blog.kaggle.com/2017/01/23/a-kaggle-master-explains-gradient-boosting/">learn more</a>)</li>
+              <li>Multiple Linear Regression (<a href="http://www.stat.yale.edu/Courses/1997-98/101/linmult.htm">learn more</a>)</li>
+              <li>Decision Tree (<a href="https://medium.com/machine-learning-101/chapter-3-decision-trees-theory-e7398adac567">learn more</a>)</li>
+              <li>Random Forest (<a href="https://medium.com/@Synced/how-random-forest-algorithm-works-in-machine-learning-3c0fe15b6674">learn more</a>)</li>
+            </ul>
+
+            <h3 class="topic-title">
+              <a name="eval">Model Evaluation</a>
+            </h3>
+
+            <p>
+              Predictors and classifiers are evaluated differently based on the type of data used to generate them.  Predictors in ioModel are evaluated using:
+            </p>
+            <ul>
+              <li><b>Max Error:</b> The max variation seen in prediction results on test data.</li>
+              <li><b>RMSE:</b> Root mean square error or root mean square deviation. (<a href="https://en.wikipedia.org/wiki/Root-mean-square_deviation">learn more</a>)</li>
+              <li><b>Explained vs. Unexplained Variance</b></li>
+              <li><b>Min/Mix/Mean/Upper and Lower Quartile Variance</b></li>
+            </ul>    
+            <p>
+              Classifiers in ioModel are evaluated using:
+            </p>
+            <ul>
+              <li><b>F1 Score:</b> Weighted average of precision and recall. <i>Formula: F1 = 2 * (precision * recall) / (precision + recall)</i></li>
+              <li><b>Recall:</b> Ratio of true positives to false negatives. <i>Formula: recall = (tp / (tp + fn))</i></li>
+              <li><b>Accuracy:</b> Percent of predicted labels that exactly match the expected label. <i>Formula: accuracy = (correct / total_num_predictions)</i></li>
+              <li><b>AUC:</b> Area under the receiver operating characteristic (ROC) curve. (<a href="http://scikit-learn.org/stable/modules/model_evaluation.html#roc-metrics">learn more</a>)</li>
+              <li><b>Precision:</b> The ability of the model not to label a positive that is actually a negative. <i>Formula: precision = tp / (tp + fp)</i></li>
+            </ul>   
+            <h5>Additional Reading: <a href="http://scikit-learn.org/stable/modules/model_evaluation.html">Model Evaluation</a></h5>                                
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<br>
+{% endblock %}

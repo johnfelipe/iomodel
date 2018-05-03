@@ -1,0 +1,135 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('data.data_details_page', data_id=my_data.id) }}">{{my_data.name}}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('model.model_details_page', model_id=my_model.id) }}">{{my_model.name}}</a></li>
+    <li class="breadcrumb-item active">API Analytics</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="card ">
+            <div class="card-header">
+              <strong>API Analytics</strong>
+            </div>
+            <div class="card-body">
+              <div class="card ">
+                  <div class="card-header">
+                      <strong></strong>
+                  </div>
+                  <div class="card-body">
+                      <div id="container" style="height: 400px; margin: 0 auto"></div>                  
+                  </div>
+                  <div class="card-footer "></div>
+              </div>    
+              <div class="card ">
+                  <div class="card-header">
+                      <strong></strong>
+                  </div>
+                  <div class="card-body">
+                    <div id="container2"></div>
+                  </div>
+                  <div class="card-footer "></div>
+              </div>                                                
+          </div>
+          <div class="card-footer "></div>
+      </div>
+    </div>
+</div>
+
+<script>
+Highcharts.chart('container2', {
+
+    title: {
+        text: 'Model Invocations per Day'
+    },
+    credits: {
+        enabled: false
+    },
+
+    subtitle: {
+        text: 'Last 30 Days'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Calls per Day'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 1
+        }
+    },
+
+    series: [{
+        name: 'Usage',
+        data: {{to_render['runs_by_day'] | safe}}
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+Highcharts.chart('container', {
+    chart: {
+        type: 'area'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Rolling Descriptive Statistics'
+    },
+    xAxis: {
+        categories: ['Rolling Statistics']
+    },
+    credits: {
+        enabled: false
+    },
+    series: [{
+        name: 'Min',
+        data: {{to_render['min'] | safe}}
+    }, {
+        name: 'Max',
+        data: {{to_render['max'] | safe}}
+    }, {
+        name: 'Mean',
+        data: {{to_render['means'] | safe}}
+    }, {
+        name: 'Standard Deviation',
+        data: {{to_render['std'] | safe}}
+    }, {
+        name: 'Variance',
+        data: {{to_render['var'] | safe}}
+    }]
+});
+</script>
+{% endblock %}

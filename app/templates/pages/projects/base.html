@@ -1,0 +1,92 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item active">{{my_project.name}}</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="card ">
+      <div class="card-header ">
+        <strong>Data sets</strong>
+        <a href={{ url_for('data.data_import_page', project_id=my_project.id) }} class="btn btn-sm btn-primary pull-right" style="background: #1387b1; border: #1387b1">Import Data</a>
+      </div>
+      <div class="card-body ">
+        <table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="d-none d-lg-table-cell">Num Observations</th>
+              <th class="d-none d-lg-table-cell">Num Features</th>
+              <th class="d-none d-lg-table-cell">Date Uploaded</th>
+              <th class="d-none d-lg-table-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for data in my_data %}
+            <tr>
+              <td><a href="{{ url_for('data.data_details_page', data_id=data.id) }}">{{data.name}}</a></td>
+              <td class="d-none d-lg-table-cell">{{data.num_rows}}</td>
+              <td class="d-none d-lg-table-cell">{{data.num_cols}}</td>
+              <td class="d-none d-lg-table-cell">{{data.uploaded_at}}</td>
+              <tD>
+                <div class="btn-group" role="group" aria-label="...">
+                  <a href="{{ url_for('data.delete_data_page', data_id=data.id) }}"><i class="fa fa-remove"></i></a>
+                </div>
+              </tD>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+          {% if not my_data %}
+          <div class="col-lg-12">
+            <p align="center" style="font-size: 24px">Sure is lonely in here. You should import some data.</p>
+          </div>
+          {% endif %}          
+        </div>
+      <div class="card-footer "></div>
+    </div>
+
+    <div class="card ">
+      <div class="card-header ">
+        <strong>My Models</strong>
+      </div>
+      <div class="card-body ">
+        <table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="d-none d-lg-table-cell">Class</th>
+              <th class="d-none d-lg-table-cell">Type</th>
+              <th class="d-none d-lg-table-cell">Created</th>
+              <th class="d-none d-lg-table-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for model in my_models %}
+            <tr>
+              <td><a href="{{ url_for('model.model_details_page', model_id=model.id) }}">{{model.name}}</a></th>
+              <td class="d-none d-lg-table-cell">{{model.features['model_class']}}</td>
+              <td class="d-none d-lg-table-cell">{{model.features['model_type']}}</td>
+              <td class="d-none d-lg-table-cell">{{model.created_at}}</td>
+              <tD><a href="{{ url_for('model.delete_model_page', model_id=model.id) }}"><i class="fa fa-remove"></i></a></tD>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>        
+        {% if not my_data %}
+        <div class="col-lg-12">
+          <p align="center" style="font-size: 24px">Sure is lonely in here. Try training a model.</p>
+        </div>
+        {% endif %}             
+        </div>
+      <div class="card-footer "></div>
+    </div>    
+`</div>
+</div>
+
+{% endblock %}

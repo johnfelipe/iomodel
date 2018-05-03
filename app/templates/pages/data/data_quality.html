@@ -1,0 +1,157 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('data.data_details_page', data_id=my_data.id) }}">{{my_data.name}}</a></li>
+  <li class="breadcrumb-item active">Data Quality</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="card ">
+      <div class="card-header ">
+        <strong>Data Quality Summary</strong>
+      </div>
+      <div class="card-body ">
+        <p>Description: {{my_data.description}}</p>
+        <div class="row">
+            <div class="col-lg-4">
+              <div class="card ">
+                  <div class="card-header ">
+                    <strong>Box and Whiskers</strong>
+                  </div>
+                  <div class="card-body ">
+                    <div id="container" style="height: 400px; max-width: 800px; margin: 0 auto"></div>                                 
+                  </div>
+                  <div class="card-footer "></div>
+              </div>
+            </div>
+            {% if dtype != 'str' %}
+            <div class="col-lg-8">
+              <div class="card ">
+                  <div class="card-header ">
+                    <strong>Data Distribution</strong>
+                  </div>
+                  <div class="card-body ">
+                    <div id="container2" style="max-width: 1200px; height: 1000px; margin: 0 auto"></div>                               
+                  </div>
+                  <div class="card-footer "></div>
+              </div>
+            </div>    
+            {% endif %}        
+          </div>
+        </div>
+      <div class="card-footer "></div>
+    </div>
+`</div>
+</div>
+
+<script>
+Highcharts.chart('container', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Overall Data Quality'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                }
+            }
+        }
+    },
+    series: [{
+        name: 'Data Quality',
+        colorByPoint: true,
+        dataLabels: {
+            enabled: true,
+            align: 'center',
+            format: '{point.y:.3f}', // one decimal
+            style: {
+                fontSize: '11px',
+            }
+        },
+        data: [{
+            name: 'Good',
+            y: {{good_percent}}
+        }, {
+            name: 'Missing',
+            y: {{missing_percent}},
+            sliced: true,
+            selected: true
+        }]
+    }]
+});
+
+
+Highcharts.chart('container2', {
+    chart: {
+        type: 'bar'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Data Completeness'
+    },
+    xAxis: {
+        categories: {{names | safe}}
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Percent Complete'
+        }
+    },
+    legend: {
+        reversed: true
+    },
+    plotOptions: {
+        series: {
+            stacking: 'normal'
+        },
+        bar: {
+            dataLabels: {
+                enabled: true,
+                align: 'right',
+                format: '{point.y:.3f}', // one decimal
+                style: {
+                    fontSize: '13px',
+                }                         
+            }
+        }        
+    },
+    series: [{
+        name: 'Good',
+        data: {{goods | safe}}
+    }, {
+        name: 'Missing',
+        data: {{missings | safe}},
+        dataLabels: {
+            enabled: true,
+            align: 'right',
+            format: '{point.y:.3f}', // one decimal
+            style: {
+                fontSize: '13px',
+            }
+        }
+    }]
+});
+</script>
+{% endblock %}

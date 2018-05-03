@@ -1,0 +1,195 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item">Documentation</li>
+  <li class="breadcrumb-item active">How tos</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+      <div class="row">
+        <div class="col-md-4 d-none d-md-block">
+          <div class="support-topic-sidebar" style="background-color: #FFF; padding: 20px; box-shadow: rgba(23, 43, 99, 0.15) 0 7px 28px;">
+            <h4>
+              Reference Articles
+            </h4>
+            <a href="#prj" class="related-link">
+              Research project quick start
+            </a><br>
+            <a href="#quick" class="related-link">
+              Data import quick start
+            </a><br>
+            <a href="#class" class="related-link">
+              How to create a classifier
+            </a><br>
+            <a href="#predictor" class="related-link">
+              How to create a predictor
+            </a><br>
+            <a href="#evaluate" class="related-link">
+              How to evaluate models
+            </a><br>
+            <a href="#recode" class="related-link">
+              How to re-code a field
+            </a><br>
+            <a href="#sample" class="related-link">
+              How to sample from a data set
+            </a>
+          </div>
+        </div>
+        <div class="col-md-8" style="background-color: #FFF; padding: 20px; box-shadow: rgba(23, 43, 99, 0.15) 0 7px 28px;">
+          <div class="support-topic-body">
+
+            <h3 class="topic-title" >
+              <a name="prj">Research project quick start<a>
+            </h3>
+
+            <p>
+              Research Projects are the basis for everything you do in ioModel. They serve as a way for you to organize your work around outcomes - grouping related tasks and artifacts (data and models).
+            </p>
+
+            <ol>
+              <li>Using the top nav, click on <i>My Research Projects</i></li>
+              <li>Click the <i>New Project</i> button</li>
+              <li>On the new project screen, give your project set a name and description.</li>
+              <li>Select the <i>Create</i> button.</li>
+            </ol>
+
+            <h3 class="topic-title" >
+              <a name="quick">Data import quick start<a>
+            </h3>
+
+            <p>
+              This How-to walks through the process of importing data into ioModel.  Once data is imported, it is stored internally in a format that allows for quick access and computation and it is immutable.  Any transforms that you apply to the data results in the creation of new data sets.
+            </p>
+            <p>
+              Once data is imported, descriptive statistics are immediately available and it can be used for correlation analysis, scatter analysis, training models, and creating derived data sets (through sampling, re-coding fields, etc.).
+            </p>
+            <ol>
+              <li>From the <i>My Research Projects</i> page, click the <i>Import Data</i> button</li>
+              <li>On the import data screen, give your data set a name and description.</li>
+              <li>Choose a file to import. <i> ioModel supports CSV files with comma delimiters where the first line of the file lists column headings. JSON and direct SQL sampling are planned future features.</i></li>
+              <li>Select the <i>Import</i> button.</li>
+            </ol>
+
+            <h3 class="topic-title">
+              <a name="class">How to create a classifier</a>
+            </h3>
+
+            <p>
+              This How-to walks through the process of creating a classifier from a data set that was already imported into ioModel.
+            </p>
+            <ol>
+              <li>From the <i>My Research Projects</i> page, click the hyper-link for the name of the data that the model should be created for.</li>
+              <li>Click the <i>Train Model</i> button.</li>
+              <li>Enter a name for your model.</li>
+              <li>Select <i>Classifier</i> as the model type. <i> Classifiers must be used to predict non-continuous labels. Attempting to do otherwise will result in an error</i></li>
+              <li>Select <i>Multiple Linear Regression</i> as the model</li>
+              <li>Using CTRL or SHIFT select, choose one or more features to train your model.</li>
+              <li>Select a target column to predict. <i> the target column should not be included in your feature selections.</i></li>
+              <li>Press the <i>Train</i> button to finish the model.</li>
+            </ol>
+
+            <h3 class="topic-title">
+              <a name="predictor">How to create a predictor</a>
+            </h3>
+
+            <p>
+              This How-to walks through the process of creating a predictor from a data set that was already imported into ioModel.
+            </p>
+            <ol>
+              <li>From the <i>My Research Projects</i> page, click the hyper-link for the name of the data that the model should be created for.</li>
+              <li>Click the <i>Train Model</i> button.</li>
+              <li>Enter a name for your model.</li>
+              <li>Select <i>Predictor</i> as the model type. <i> Predictors must be used to predict continuous integer or float data. Attempting to do otherwise will result in an error</i></li>
+              <li>Select <i>Multiple Linear Regression</i> as the model</li>
+              <li>Using CTRL or SHIFT select, choose one or more features to train your model.</li>
+              <li>Select a target column to predict. <i> the target column should not be included in your feature selections.</i></li>
+              <li>Press the <i>Train</i> button to finish the model.</li>
+            </ol>
+
+            <h3 class="topic-title">
+              <a name="evaluate">How to evaluate models</a>
+            </h3>
+
+            <p>
+              When you first train a model using ioModel, the application performs an 80:20 training/test sampling of the data and uses the 80% to train the model and the remaining 20% to evaluate the results.  When the model is created, you'll see a different set of measurement results depending on whether you created a predictor or classifier.
+            </p>
+            <p>
+              Beyond the training/test split evaluation, ioModel supports 2 additional methods for evaluating the performance of your model:
+            </p>
+            <ul>
+              <li>Leave one out cross validation (LOOCV) - supported for data sets with an N of < 2000</li>
+              <li>Prediction/evaluation of custom test data sets</li>
+            </ul>
+            <p>
+              To use LOOCV (works well for data with an N < 2000):
+            </p>
+            <ol>
+              <li>From the <i>My Research Projects</i> page, click the hyper-link for the name of the model that you want to evaluate.</li>
+              <li>Click the <i>Evaluate Model</i> button.</li>
+              <li>See documentation under Machine Learning for how to interpret the results.</li>
+            </ol>
+
+            <p>
+              To use custom test data sets (works well for data with an N > 2000):
+            </p>
+            <ol>
+              <li>Using the <a href="#sample">How to for sampling data</a>, import a larger data set and create a sample of that data.</li>
+              <li>Using the <a href="#predictor">How to for creating a model</a>, create a model using the desired features and target for the sampled training data set.</li>
+              <li>Click the <i>Predictions</i> button.</li>
+              <li>Click the <i>Predict</i> button.</li>
+              <li>Select the original, larger data set (evident by the data set name and number of rows).</li>
+              <li>Leave the <i>Prediction Mode</i> value set to default.</li>
+              <li>Click <i>Next</i>.</li>
+              <li>See documentation under <a href={{ url_for('main.ml_page') }}>Machine Learning</a> for how to interpret the results.</li>
+            </ol>
+
+            <h3 class="topic-title">
+              <a name="recode">How to re-code a field</a>
+            </h3>
+
+            <p>
+              This How-to explains the process of re-coding a string field with numeric labels.  This process is important for creating classifiers as the target labels need to be coded numerically. ioModel makes this process straigtforward by automating all of the boilerplate work.
+            </p>
+            <ol>
+              <li>From the <i>My Research Projects</i> page, click the hyper-link for the name of the data that the model should be created for.</li>
+              <li>Click the <i>Transform</i> button.</li>
+              <li>Click the link for <i>Re-code Field</i>.</li>
+              <li>Enter a name for the derived data set.</li>
+              <li>Select the field you want to re-code.</li>
+              <li>Press the <i>Next</i> button.</li>
+              <li>Enter a numeric value for each label. As a convention, it's good practice to start at 0 and increment forward for each new label</li>
+              <li>Press the <i>Re-Code</i> button.</li>
+            </ol>
+            <p>
+              Upon completion of the re-coding process, you are taken to a new (derived) data set. The original data is still intact. The new data is saved with the name that was provided and allows provides for a detailed record of each step of processing along with all of the incremental artifacts that were generated.
+            </p>
+
+            <h3 class="topic-title">
+              <a name="sample">How to sample from a data set</a>
+            </h3>
+
+            <p>
+              This How-to explains the process of performing a random sample on an existing data set.  This process is important for creating test/training splits of larger data sets or down-sampling a large data set to allow for the use of LOOCV.
+            </p>
+            <ol>
+              <li>From the <i>My Research Projects</i> page, click the hyper-link for the name of the data that the model should be created for.</li>
+              <li>Click the <i>Transform</i> button.</li>
+              <li>Click the link for <i>Sample</i>.</li>
+              <li>Enter a name for the derived data set.</li>
+              <li>Enter a percent of data you want remaining (.3 for a derived data set containing a random sampling of 30% of the observations).</li>
+              <li>Press the <i>Sample</i> button.</li>
+            </ol>
+            <p>
+              Upon completion of the sampling process, you are taken to a new (derived) data set. The original data is still intact. The new data is saved with the name that was provided and allows provides for a detailed record of each step of processing along with all of the incremental artifacts that were generated.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<br>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item active">{{my_data.name}}</li>
+</ol>
+
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+          <div class="card-header ">
+            <strong>Data Summary</strong>
+          </div>        
+            <div class="card-body ">
+                <h6>Description: {{my_data.description}}</h6>
+                <p>Number of Rows: {{my_data.num_rows}} / Number of Columns: {{my_data.num_cols}}</p>
+
+
+                <a href={{ url_for('data.top_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-file-text-o" aria-hidden="true"></i>
+&nbsp;Top</a><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-code-fork" aria-hidden="true"></i>
+&nbsp;Transform</a><a href={{ url_for('data.analyze_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-bar-chart" aria-hidden="true"></i>
+&nbsp;Correlation</a><a href={{ url_for('data.scatter_analysis_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-line-chart" aria-hidden="true"></i>
+&nbsp;Scatter</a><a href={{ url_for('model.train_model_page', data_id=my_data.id) }} class="btn btn-success pull-right" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-random" aria-hidden="true"></i>
+&nbsp;Train Model</a><a href={{ url_for('data.data_quality_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-stethoscope" aria-hidden="true"></i>
+&nbsp;Data Quality</a><a href={{ url_for('data.csv_download', filename=filename, data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-cloud-download" aria-hidden="true"></i></i>
+&nbsp;Download</a><br>
+                <div class="panel" style="padding-top: 30px;">
+                    <div class="panel-body">
+                      <table class="table table-hover table-striped table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Col Name</th>
+                            <th>Type</th>
+                            <th class="d-none d-lg-table-cell">Min</th>
+                            <th class="d-none d-lg-table-cell">Max</th>
+                            <th class="d-none d-lg-table-cell">Mean</th>
+                            <th class="d-none d-lg-table-cell">Median</th>
+                            <th class="d-none d-lg-table-cell">Mode</th>
+                            <th class="d-none d-lg-table-cell">Std. Dev.</th>
+                            <th class="d-none d-lg-table-cell">Variance</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {% for x in range(0, names.__len__()) %}
+                        <tr>
+                          <td><a href={{ url_for('data.data_viz_page', data_id=my_data.id, col_name=names[x], type=types[x].__name__) }} >{{names[x]}}</a></td>
+                          <td>{{types[x].__name__}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["min"]}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["max"]}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["mean"]}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["median"]}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["mode"]}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["std"]}}</td>
+                          <td class="d-none d-lg-table-cell">{{stats[x]["var"]}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-footer "></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

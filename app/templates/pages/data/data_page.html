@@ -1,0 +1,53 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<div class="theme-docs-wrapper" style="margin-top: 20px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="mt-4">My Data Sets</h4>
+                <a href={{ url_for('data.data_import_page') }} class="btn btn-success btn-sm pull-right" style="margin-top: -20px; background: #1387b1; border: #1387b1">Import Data</a>
+                <div class="panel" style="margin-top: 40px;">
+
+                    <div class="panel-body" style="padding-bottom: 20px;">
+
+                      <table class="table table-hover table-striped" style="padding-top: 50px;">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th class="d-none d-lg-table-cell">Row Count</th>
+                            <th class="d-none d-lg-table-cell">Feature Count</th>
+                            <th class="d-none d-lg-table-cell">Date Uploaded</th>
+                            <th class="d-none d-lg-table-cell">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for data in my_data %}
+                          <tr>
+                            <td><a href="{{ url_for('data.data_details_page', data_id=data.id) }}">{{data.name}}</a></td>
+                            <td class="d-none d-lg-table-cell">{{data.num_rows}}</td>
+                            <td class="d-none d-lg-table-cell">{{data.num_cols}}</td>
+                            <td class="d-none d-lg-table-cell">{{data.uploaded_at}}</td>
+                            <tD class="d-none d-lg-table-cell">
+                              <div class="btn-group" role="group" aria-label="...">
+                                <a href="{{ url_for('data.delete_data_page', data_id=data.id) }}"><i class="fa fa-remove"></i></a>
+                              </div>
+                            </tD>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if my_data|length < 2 %}
+    <br><br><Br><br><br><Br><br><br>
+    {% endif %}
+    {% if my_data|length < 4 %}
+    <br><br><Br><br><br>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item active">Projects</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="card ">
+      <div class="card-header ">
+        <strong>Dashboard</strong>
+        <a href={{ url_for('main.new_project_page') }} class="btn btn-sm btn-primary pull-right" style="background: #1387b1; border: #1387b1">New Project</a>
+      </div>
+      <div class="card-body ">
+        <table class="table table-hover table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="d-none d-lg-table-cell">Description</th>
+              <th class="d-none d-lg-table-cell">Created At</th>
+              <th class="d-none d-lg-table-cell">Data sets</th>
+              <th class="d-none d-lg-table-cell">Trained Models</th>
+              <th class="d-none d-lg-table-cell">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prj in my_projects %}
+            <tr>
+              <td><a href="{{ url_for('main.my_project_page', project_id=prj.id) }}">{{prj.name}}</a></td>
+              <td class="d-none d-lg-table-cell">{{prj.description}}</td>
+              <td class="d-none d-lg-table-cell">{{prj.created_at}}</td>
+              <td class="d-none d-lg-table-cell">{{prj.num_sets()}}</td>
+              <td class="d-none d-lg-table-cell">{{prj.num_models()}}</td>              
+              <tD class="d-none d-lg-table-cell">
+                <div class="btn-group" role="group" aria-label="...">
+                  <a href="{{ url_for('main.delete_project_page', project_id=prj.id) }}"><i class="fa fa-remove"></i></a>
+                </div>
+              </tD>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>        
+        {% if not my_projects %}
+        <div class="col-lg-12">
+          <p align="center" style="font-size: 24px">Sure is lonely in here. Why not start a project?</p>
+        </div>
+        {% endif %}             
+        </div>
+      <div class="card-footer "></div>
+    </div>
+`</div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+<li class="breadcrumb-item">Home</li>
+<li class="breadcrumb-item">Manage Errors</li>
+<li class="breadcrumb-item active">System Error Trends</li>
+</ol>
+
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+            <div class="card-header">
+                <strong>Logged Errors by Day</strong>
+            </div>               
+            <div class="card-body">                  
+                  <div id="container2"></div>
+            </div>
+            <div class="card-footer "></div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+Highcharts.chart('container2', {
+
+    title: {
+        text: 'Errors Over Time'
+    },
+    credits: {
+        enabled: false
+    },
+
+    subtitle: {
+        text: 'Last 30 Days'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Errors per Day'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 1
+        }
+    },
+
+    series: [{
+        name: 'Logged Errors',
+        data: {{errors_by_day | safe}}
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+</script>
+{% endblock %}

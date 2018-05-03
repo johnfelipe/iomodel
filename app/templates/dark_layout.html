@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Twin Tech Labs - ioModel</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
+        <link rel="shortcut icon" href="images/favicon.ico">
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans:300" rel="stylesheet">
+        
+        <!-- stylesheets -->
+        <link href="{{ url_for('static', filename='css/flag-icon-css/css/flag-icon.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/simple-line-icons/css/simple-line-icons.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+        <!-- javascript -->
+        <script src="{{ url_for('static', filename='js/popper.js/dist/umd/popper.min.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/pace-progress/pace.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/perfect-scrollbar/dist/perfect-scrollbar.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/@coreui/coreui/dist/js/coreui.min.js') }}"></script>
+
+        <script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/modules/exporting.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/highcharts-more.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/modules/wordcloud.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/modules/histogram-bellcurve.js') }}"></script>
+        <!-- Start of twintechlabs Zendesk Widget script -->
+        <script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(e){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var e=this.createElement("script");n&&(this.domain=n),e.id="js-iframe-async",e.src="https://assets.zendesk.com/embeddable_framework/main.js",this.t=+new Date,this.zendeskHost="twintechlabs.zendesk.com",this.zEQueue=a,this.body.appendChild(e)},o.write('<body onload="document._l();">'),o.close()}();
+        /*]]>*/</script>
+        <script>
+          window.zESettings = {
+            webWidget: {
+              position: {
+                horizontal: 'left',
+                vertical: 'bottom'     
+              },
+              offset: { horizontal: '23px' }
+            }
+          };
+          </script>          
+        <!-- End of twintechlabs Zendesk Widget script -->        
+    </head>
+    <body>
+        {% block body %}
+        <div class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+          <header class="app-header navbar">
+            <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.project_page') }}">
+                <img src="/static/images/TwinTech1white.png" class="d-none d-lg-inline mr-2 w-25">
+                <font style="color: #1387b1">io</font><font style="color: #FFF" class="d-none d-lg-inline">Model</font><div class="d-block d-lg-none"><font style="color: #000">Model</font></div>
+            </a>
+            <a class="nav-link nav-link--rounded pull-right" style="margin-right: 10px;" href="{{ url_for('user.logout') }}">
+              Sign out
+            </a>
+          </header>
+          <div class="app-body">
+            <div class="sidebar">
+              <nav class="sidebar-nav">
+                <ul class="nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.project_page') }}">
+                      <i class="nav-icon icon-speedometer"></i> Projects
+                    </a>
+                  </li>    
+                  <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                      <i class="nav-icon icon-wrench"></i> Support</a>
+                    <ul class="nav-dropdown-items">
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.howto_page') }}">
+                          <i class="nav-icon icon-user"></i> How to</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.ml_page') }}">
+                          <i class="nav-icon icon-lock"></i> ML Primer</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.faq_page') }}">
+                          <i class="nav-icon icon-lock"></i> FAQ</a>
+                      </li>                      
+                    </ul>
+                  </li>                                             
+                  <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                      <i class="nav-icon icon-wrench"></i> Account</a>
+                    <ul class="nav-dropdown-items">
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.user_profile_page') }}">
+                          <i class="nav-icon icon-user"></i> Profile</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.change_password') }}">
+                          <i class="nav-icon icon-lock"></i> Password</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="nav-title">Admin</li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.user_admin_page') }}">
+                      <i class="nav-icon icon-people"></i> Users</a>
+                  </li>
+                  <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                      <i class="nav-icon icon-support"></i> Errors</a>
+                    <ul class="nav-dropdown-items">
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.error_trends_page') }}">
+                          <i class="nav-icon icon-chart"></i> Trends</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.error_log_page') }}">
+                          <i class="nav-icon icon-magnifier"></i> Logs</a>
+                      </li>
+                    </ul>
+                  </li>                  
+                </ul>
+              </nav>
+            </div>
+          {% block pre_content %}{% endblock %}
+          <main class="main">
+          {# One-time system messages called Flash messages #}
+          {% block flash_messages %}
+              {%- with messages = get_flashed_messages(with_categories=true) -%}
+                  {% if messages %}
+                      {% for category, message in messages %}
+                          {% if category=='error' %}
+                              {% set category='danger' %}
+                          {% endif %}
+                          <div style="margin-bottom: -2px;" role="alert" class="alert alert-{{category}} alert-dismissible fade show">{{ message|safe }}</div>
+                      {% endfor %}
+                  {% endif %}
+              {%- endwith %}
+          {% endblock %}
+
+          {% block content %}{% endblock %}
+          </main>
+          {% block post_content %}{% endblock %}
+
+        {% endblock %}
+        </div>
+        <footer class="app-footer">
+          <div>ioModel &copy; 2018 Twin Tech Labs<div class="d-none d-lg-inline"> - Patents Pending</div></div>
+          <div class="ml-auto d-none d-lg-inline">
+            <span>Powered by</span>
+            <a href="https://github.com/apple/turicreate">Turi Create</a>
+            <span>(&copy; 2018 Apple Inc.)</span>
+          </div>
+        </footer>
+      </div>
+        <script>
+            // Hide loader
+            (function() {
+                $(".alert").fadeTo(4000, 500).slideUp(500, function(){
+                    $(".alert").slideUp(500);
+                });
+            })();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,152 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item">Documentation</li>
+  <li class="breadcrumb-item active">FAQ</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+      <div class="row">
+        <div class="col-md-4 d-none d-md-block">
+          <div class="support-topic-sidebar" style="background-color: #FFF; padding: 20px; box-shadow: rgba(23, 43, 99, 0.15) 0 7px 28px;">
+            <h4>
+              Common questions
+            </h4>
+            <a href="#ioModel" class="related-link">
+              What is ioModel?
+            </a><br>
+            <a href="#ml" class="related-link">
+              What is machine learning?
+            </a><br>
+            <a href="#diff" class="related-link">
+              What is the difference between a classifier and a predictor?
+            </a><br>
+            <a href="#things" class="related-link">
+              What kinds of things can I do with ioModel?
+            </a><br>
+            <a href="#easy" class="related-link">
+              Is it really this easy?
+            </a><br>
+            <a href="#repro" class="related-link">
+              Are the results reproducible?
+            </a><br>
+            <a href="#secure" class="related-link">
+              Is ioModel secure?
+            </a><br>    
+            <a href="#privacy" class="related-link">
+              What about privacy?
+            </a>                       
+          </div>
+        </div>
+        <div class="col-md-8" style="background-color: #FFF; padding: 20px; box-shadow: rgba(23, 43, 99, 0.15) 0 7px 28px;">
+          <div class="support-topic-body" >
+            
+            <h3 class="topic-title" >
+              <a name="ioModel">What is ioModel?<a>
+            </h3>
+
+            <p>
+              ioModel represents a new paradigm for machine learning and is designed from the ground up to lower the cost of research and development by democratizing access to machine learning algorithms while streamlining work-flows to reduce cycle time. Furthermore, ioModel leverages best practices gleaned from statistics in order to provide a platform that can ensure actionable, repeatable results after training on hundreds to thousands of examples, not millions.   
+            </p>
+            <p>
+              Rather than writing code, researchers can interact with their data and the models they create visually - allowing for a singular focus on data and methodology as opposed to creating boilerplate code that is prone to errors. In this way, researchers and subject matter experts are able to advance their own research without waiting for expensive development teams and data scientists. 
+            </p>
+            <p>
+              Despite a focus on researchers and business analysts, ioModel facilitates ease of integration with existing systems and engineers by auto-publishing each model as a web API and by providing excellent documentation for developers to leverage the models created. This approach allows for more close collaboration between researchers/business analysts and the development teams positioned to exploit the models that get created.
+            </p>
+            <p>
+              Our world is faced with countless challenges. Its our hope that by putting best-in-class algorithms and practices in the hands of experts for a fair price, we can work to solve them faster, together.
+            </p>
+
+            <h3 class="topic-title">
+              <a name="ml">What is machine learning?</a>
+            </h3>
+
+            <p>
+              If Data Science is an offshoot of statistics, machine learning is born of engineering and computer science. It is a branch of artificial intelligence that automates the creation of complex models by providing examples of data from which computer algorithms can learn. The models you create with machine learning are similar to models you might create using a technique like multiple linear regression in statistics. In many cases, those same statistical methods underpin the more complex techniques used in machine learning.
+            </p>
+            <p>
+              In statistics, a target is called a dependent variable.  Variables (as they are known in statistics) are called features in machine learning. ioModel blends the terminology and provides features such as automated coefficient of correlation analysis to improve your work flow.  You'll see descriptive statistics front and center along side some more specific machine learning terminology. ioModel leverages the best of both worlds.
+            </p>
+            <h5>Additional Reading: <a href="https://medium.com/machine-learning-for-humans/why-machine-learning-matters-6164faf1df12">Machine Learning Primer</a></h5>
+
+            <h3 class="topic-title">
+              <a name="diff">What is the difference between a classifier and a predictor?</a>
+            </h3>
+
+            <p>
+              Classifiers (or classification models), predict either nominal or categorical class labels based on training data. Predictive models (or predictors) are often forms for regression functions and predict continuous values.
+            </p>
+              The distinction is important as both are measured for accuracy and performance differently.
+            </p>       
+            <h5>Additional Reading: <a href="http://scikit-learn.org/stable/modules/model_evaluation.html">Model Evaluation</a></h5>
+
+            <h3 class="topic-title">
+              <a name="things">What kinds of things can I do with ioModel?</a>
+            </h3>
+
+            <p>
+              At it's core, ioModel is a tool that facilitates the rapid creation and evaluation of machine learning models. Currently, we support predictors and classifiers and offer multiple regression, support vector machines, decision trees, random forests, and gradient boosting models. 
+            </p>
+              Additionally, ioModel has a number of auxiliary features focused on making model generation easier. ioModel provides functions for cleaning data, transforming data, sampling from larger data sets, automatic leave-on-out cross validation, prediction of new data sets, and the evaluation of relationships between features in the data by way of scatter analysis and coefficient of correlation. Chaining these features together allows ioModel to solve most complex machine learning tasks with no manual coding.
+            </p>
+            </p>
+              Finally, all models generated are auto-deployed as web services with complete documentation. This allows models created with ioModel to be integrated easily with existing business and scientific instruments, allowing for the rapid creation of new instruments and insights. 
+            </p>
+
+            <h3 class="topic-title">
+              <a name="easy">Is it really this easy?</a>
+            </h3>
+
+            <p>
+              Yes!  ioModel was designed to democratize access to machine learning.  Models can be designed and tested with a data set and few clicks - no more taking 3-6 months of on-line programming classes or going for a data science degree to be able to access the powerful algorithms that ioModel provides.
+            </p>
+              ioModel is best leveraged by experienced researchers or business analysts with a solid grounding in statistical methods as ioModel relies on them heavily to describe data, variance, and the performance of the models you create.
+            </p>
+
+            <h3 class="topic-title">
+              <a name="repro">Are the results reproducible?</a>
+            </h3>
+
+            <p>
+              Yes! Aside from great UI design and a relentless focus on streamlining work-flow - there is no "magic" here. ioModel stands on the shoulders of giants and is an incremental, user experience centric, improvement to methodologies that exist today. 
+            </p>
+              All of the machine learning models and many of the statistical computations are provided by a combination of NumPy, SciPy, and Turi Create. The computations that were developed by Twin Tech Labs follow key formulas from the field of statistics. Any research developed in ioModel can be verified manually and we encourage it!
+            </p>     
+
+            <h3 class="topic-title">
+              <a name="secure">Is ioModel secure?</a>
+            </h3>
+
+            <p>
+              ioModel is licensed and sold in two primary ways: 
+            </p>
+            <ol>
+              <li>Public subscription-based service</li>
+              <li>Hosted solutions for institutions</li>
+            </ol>
+            <p>
+              For the public subscription based service, we make every effort to secure data and personal details. Your credit card is stored off-site and accessed only by secure, encrypted tokens. Your data is only accessible by you and our servers are secured behind firewalls. Data is encrypted on our file systems. That said, the public subscription service is hosted on servers connected to the Internet and there is some risk of breach.  We recommend that you not upload data files with PII and only work with anonymized for purposes of training machine learning models.  
+            </p> 
+            <p>
+              Our hosted solutions are HIPPA compliant and fully secured.   
+            </p> 
+
+            <h3 class="topic-title">
+              <a name="secure">What about privacy?</a>
+            </h3>
+
+            <p>
+              We will never sell or share your data, with anyone. Your data is yours. When you delete it, its gone from our servers.  Additionally, your personal information is secured, credit cards for subscriptions are secured and stored off-site with Stripe, and we will never share your details with any third-party. 
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<br>
+{% endblock %}

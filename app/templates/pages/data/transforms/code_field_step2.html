@@ -1,0 +1,43 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }}>Transforms</a></li>
+  <li class="breadcrumb-item active">Re-Code String Field (Step 2 of 2)</li>
+</ol>
+
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+        <form action="" id="form" method="POST" class="form" role="form">
+          <div class="card-header ">
+            <strong>Re-code a text field to numeric so you can develop a classifier model</strong>
+          </div>
+          <div class="card-body ">
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="data_id" value="{{my_data.id}}">
+                <input type="hidden" name="name" value="{{name}}">
+                <div class="form-group">
+                  {% for x in range(0, ntarget_data.__len__()) %}
+                    <div class="form-group">
+                      <label for="name">{{ntarget_data[x]}}</label>
+                      <input type="text" required="true" class="form-control" id="new_value{{x}}" name="new_value{{x}}" placeholder="Enter a numeric value for this string">
+                    </div>
+                  {% endfor %}
+                </div>
+          </div>
+          <div class="card-footer ">
+            <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Transforming Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Transform</button>                 
+            <a class="btn btn-sm btn-danger" href="{{ url_for('transforms.transform_page', data_id=my_data.id) }}"><i class="fa fa-ban "></i> Cancel</a>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+{% endblock %}

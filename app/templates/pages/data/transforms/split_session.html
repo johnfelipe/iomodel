@@ -1,0 +1,57 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }}>Transforms</a></li>
+  <li class="breadcrumb-item active">Training/Test Split (session based)</li>
+</ol>
+
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+        <form action="" id="form" method="POST" class="form" role="form">
+          <div class="card-header ">
+            <strong>For longitudinal data (or time series sensors), randomly sample the original data and create two new fractional data sets.</strong>
+          </div>
+          <div class="card-body ">
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="data_id" value="{{my_data.id}}">
+            <div class="form-group">
+              <label for="train">Name (Training)</label>
+              <input type="text" required="true" class="form-control" id="train" name="train" aria-describedby="train" placeholder="Enter a name for the new data set">
+            </div>
+            <div class="form-group">
+              <label for="test">Name (Test)</label>
+              <input type="text" required="true" class="form-control" id="test" name="test" aria-describedby="test" placeholder="Enter a name for the new data set">
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                  <label for="name">Enter a fractional data split:</label>
+                  <input type="number" required="true" min="0.1" max="0.9" step="0.1" class="form-control" id="percent" name="percent" placeholder=".8 to return a 80:20 training/test split">
+                </div>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="idField">Select a Session ID Field</label>
+              <select class="form-control" required="true" id="idField" name="idField">
+                <option value="">--- Select a Session ID field ---</option>
+                {% for x in range(0, names.__len__()) %}
+                <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="card-footer ">
+            <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Transforming Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Transform</button>                 
+            <a class="btn btn-sm btn-danger" href="{{ url_for('transforms.transform_page', data_id=my_data.id) }}"><i class="fa fa-ban "></i> Cancel</a>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
