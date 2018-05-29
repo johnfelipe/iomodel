@@ -20,19 +20,23 @@
             <div class="card-body">
               <div class="card ">
                   <div class="card-header">
-                      <strong></strong>
+                      <strong>Model Invocations per Day</strong>
                   </div>
                   <div class="card-body">
-                      <div id="container" style="height: 400px; margin: 0 auto"></div>                  
+                      <div id="container2" style="height: 400px; margin: 0 auto"></div>                  
                   </div>
                   <div class="card-footer "></div>
               </div>    
               <div class="card ">
                   <div class="card-header">
-                      <strong></strong>
+                      <strong>Rolling Descriptive Statistics</strong>
                   </div>
                   <div class="card-body">
-                    <div id="container2"></div>
+                    <div id="container"></div>
+                    <div id="container3"></div>
+                    <div id="container4"></div>
+                    <div id="container5"></div>
+                    <div id="container6"></div>
                   </div>
                   <div class="card-footer "></div>
               </div>                                                
@@ -46,7 +50,7 @@
 Highcharts.chart('container2', {
 
     title: {
-        text: 'Model Invocations per Day'
+        text: ''
     },
     credits: {
         enabled: false
@@ -106,7 +110,29 @@ Highcharts.chart('container', {
         enabled: false
     },
     title: {
-        text: 'Rolling Descriptive Statistics'
+        text: 'Max'
+    },
+    xAxis: {
+        categories: ['Rolling Statistics']
+    },
+    credits: {
+        enabled: false
+    },
+    series: [{
+        name: 'Max',
+        data: {{to_render['max'] | safe}}
+    }]
+});
+
+Highcharts.chart('container3', {
+    chart: {
+        type: 'area'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Min'
     },
     xAxis: {
         categories: ['Rolling Statistics']
@@ -117,16 +143,70 @@ Highcharts.chart('container', {
     series: [{
         name: 'Min',
         data: {{to_render['min'] | safe}}
-    }, {
-        name: 'Max',
-        data: {{to_render['max'] | safe}}
-    }, {
+    }]
+});
+
+Highcharts.chart('container4', {
+    chart: {
+        type: 'area'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Mean'
+    },
+    xAxis: {
+        categories: ['Rolling Statistics']
+    },
+    credits: {
+        enabled: false
+    },
+    series: [{
         name: 'Mean',
         data: {{to_render['means'] | safe}}
-    }, {
+    }]
+});
+
+Highcharts.chart('container5', {
+    chart: {
+        type: 'area'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Standard Deviation'
+    },
+    xAxis: {
+        categories: ['Rolling Statistics']
+    },
+    credits: {
+        enabled: false
+    },
+    series: [{
         name: 'Standard Deviation',
         data: {{to_render['std'] | safe}}
-    }, {
+    }]
+});
+
+Highcharts.chart('container6', {
+    chart: {
+        type: 'area'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Variance'
+    },
+    xAxis: {
+        categories: ['Rolling Statistics']
+    },
+    credits: {
+        enabled: false
+    },
+    series: [{
         name: 'Variance',
         data: {{to_render['var'] | safe}}
     }]

@@ -171,7 +171,7 @@ def error_log_page():
 
 @main_blueprint.route('/')
 def project_page():
-    if not current_user.is_authenticated:
+    if current_user is None or not current_user.is_authenticated:
         return redirect(url_for('user.login'))    
     my_projects = Project.query.filter_by(user_id=current_user.id).order_by(Project.name).all()
     return render_template('pages/projects/project_page.html',

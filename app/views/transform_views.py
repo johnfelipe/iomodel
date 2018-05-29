@@ -164,11 +164,11 @@ def classify_page():
 
         if request.method == 'POST':
             target = request.form['target']
+            data_frame = data_frame.dropna(str(target), how="all")
             orig_data = data_frame[str(target)]
             norig_data = orig_data.to_numpy() 
             classes = []
             for data in norig_data:
-                print(data)  
                 appended = False 
                 for x in range(1, int(request.form['num_brackets'])+1):
                     if float(data) >= float(request.form['lrange_' + str(x)]) and float(data) < float(request.form['urange_' + str(x)]):
@@ -177,7 +177,6 @@ def classify_page():
                         appended = True
                         continue 
                 if appended == False:
-                    print("unknown") 
                     classes.append("unknown")   
 
             data_frame = safely_add_col(str(request.form['field']), classes, data_frame)            

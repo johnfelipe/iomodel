@@ -29,7 +29,8 @@ MAIL_PASSWORD = 'yourpassword'
 MAIL_DEFAULT_SENDER = '"You" <you@gmail.com>'
 
 ALLOWED_EXTENSIONS = set(['csv'])
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/home/YOUR_USER/iomodel/uploads'
+APP_FOLDER = '/home/YOUR_USER/iomodel/'
 
 ADMINS = [
     '"Admin One" <admin1@gmail.com>',

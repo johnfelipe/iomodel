@@ -1,4 +1,4 @@
-# ioModel Research Platform - v0.8.1
+# ioModel Research Platform - v0.9.0
 
 ![Screenshot](https://github.com/twintechlabs/iomodel/blob/master/app/static/images/screenshot.png)
 
@@ -13,9 +13,13 @@ manage them as a deployed RESTful endpoint for integration into other systems.
 Read more about it in the primer located here:
 http://twintechlabs.io/Twin%20Tech%20Labs%20Primer.pdf
 
+## Disclaimer
+
+ioModel is under active development, is in the early stages of release, and may contain bugs. We'll fix them as soon as they come up. Software is provided as-is.
+
 ## Code characteristics
 
-* Tested on Python 2.6, 2.7
+* Tested on Python 2.7
 * Well organized directories with lots of comments
     * app
         * commands
@@ -64,6 +68,21 @@ Create a database for your app and then run:
     # Or if you have Fabric installed:
     fab init_db
 
+## Setting up paths for local data frame storage
+
+ioModel uses a database for managing users and relationships between models and data sets as well as for caching computationally expensive operations on immutable data. However, the file system is used to store raw data frames and a number of intermediary file types.
+
+This section needs to be expanded to explain how to use the director scheme with network file mounts to support growable, sustainable storage, however, to get things running for now:
+
+    # In the ioModel app directory you cloned from GitHUb:
+    mkdir uploads
+    cd uploads
+    mkdir slice1
+    mkdir slice2
+
+    # Then, edit app/local_settings.py to point the following two variables to appropriate paths for your install:
+    UPLOAD_FOLDER = '/home/YOUR_USER/iomodel/uploads'
+    APP_FOLDER = '/home/YOUR_USER/iomodel/'
 
 ## Running the app
 

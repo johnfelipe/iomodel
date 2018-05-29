@@ -18,34 +18,81 @@ import random
 import psycopg2
 
 from app import db
-from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, ErrorLog, StorageSlice
+from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, ErrorLog, StorageSlice, ClusterAnalysis
 import uuid, json, os
 import datetime
+
+def has_column(col_name, data_frame):
+    cols = data_frame.column_names()
+    if col_name in cols:
+        return True
+    return False
+
+def safely_add_col(col_name, data_to_add, data_frame):
+    cols = data_frame.column_names()
+    if col_name in cols:
+        data_frame.remove_column(col_name)
+    sa = SArray(data=data_to_add)
+    return data_frame.add_column(sa, col_name)
+
+def save_data(my_data, name, new_frame):
+    data = UserData()
+    data.user_id = current_user.id
+    data.project_id = my_data.project_id
+    data.description = "Cluster analysis based on " + my_data.name
+    data.path = my_data.path
+    data.fname = my_data.fname
+    data.name=name
+    data.num_rows = new_frame.num_rows()
+    data.num_cols = new_frame.num_columns()
+    data.sname = os.path.join(data.path, str(uuid.uuid4())  + "_sframe")
+    cols = new_frame.column_names()
+    types = new_frame.column_types()
+    stats = []
+    for x in range(0, cols.__len__()):
+        cdata_all = new_frame[cols[x]]
+        data_frame_cleaned = new_frame.dropna(str(cols[x]), how="all")
+        cdata = data_frame_cleaned[cols[x]]
+
+        missing = round(float(cdata_all.countna())/float(len(cdata_all)), 2) * 100
+        if (str(types[x].__name__) == "str"):
+            stats.append({"min": "-", "max": "-", "mean": "-", "median": "-", "mode": "-", "std": "-", "var": "-", "sum": "-", "missing": missing})
+        else:
+            ndata = cdata.to_numpy()
+            ndata = np.array(ndata).astype(np.float)
+            stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "missing": missing})
+
+    data.stats = stats
+    new_frame.save(data.sname)
+    db.session.add(data)
+    db.session.commit()
+    return data.id
 
 data_blueprint = Blueprint('data', __name__, template_folder='templates')
 
 @data_blueprint.route('/data/<path:filename>', methods=['GET'])
 def csv_download(filename):
-    try:
+    # try:
         data_id = request.args.get('data_id')
         my_data = UserData.query.filter_by(id=data_id).first()
         data_frame = tc.load_sframe(my_data.sname)
-        print(my_data.sname)
         if not os.path.isfile(my_data.sname + "_export.csv"):   
             data_frame.export_csv(my_data.sname + "_export.csv")    
         root_dir = os.path.dirname(os.getcwd())
         direc = os.path.dirname(my_data.path)
         direc = os.path.join(direc, str(my_data.user_id))
+        print(current_app.config['APP_FOLDER'] + direc)
+        print(os.path.basename(my_data.sname) + "_export.csv")
         return send_from_directory(directory=direc, filename=os.path.basename(my_data.sname) + "_export.csv")
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 
 def allowed_file(filename):
@@ -66,6 +113,28 @@ def nan_to_null(f,
     return None
 
 psycopg2.extensions.register_adapter(float, nan_to_null)
+
+@data_blueprint.route('/delete_cluster', methods=['GET'])
+@login_required  # Limits access to authenticated users
+def delete_cluster():
+    try:
+        cluster_id = request.args.get('cluster_id')
+        data_id = request.args.get('data_id')
+
+        db.session.query(ClusterAnalysis).filter_by(id = cluster_id).delete()
+        db.session.commit()
+
+        flash('You successfully deleted your cluster analysis!', 'success')
+        return redirect(url_for('data.cluster_page', data_id=data_id))
+    except Exception as e:
+        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+        error = ErrorLog()
+        error.user_id = current_user.id
+        error.error = str(e.__class__)
+        error.parameters = request.args
+        db.session.add(error)
+        db.session.commit()
+        return redirect(request.referrer)
 
 @data_blueprint.route('/delete_data', methods=['GET'])
 @login_required  # Limits access to authenticated users
@@ -241,6 +310,111 @@ def scatter_analysis_page():
         db.session.commit()
         return redirect(request.referrer)
 
+@data_blueprint.route('/compare', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def compare_page():
+        data_id = request.args.get('data_id')
+    # try:
+        my_data = UserData.query.filter_by(id=data_id).first()
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+        form = TrainModelForm(request.form, obj=None)
+        data_frame = tc.load_sframe(my_data.sname)
+        render_plot = False
+        target = None
+        cols = []
+        display_cols = []
+        features = []
+        categories = []
+        plot_data = []
+        means = {}
+        boxplots = {}
+        outliers = {}        
+        total_attrs = 0
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+        num_matching = 0
+        total_rows = 0
+
+        if request.method == 'POST':
+            render_plot = True
+            truth = request.form['truth']
+            comp = request.form['comp']
+            features = request.form.getlist('features')
+            data_frame = tc.load_sframe(my_data.sname)
+            data_frame = data_frame.dropna(str(truth), how="any")
+            data_frame = data_frame.dropna(str(comp), how="any")
+            for x in range(0, names.__len__()):
+                if (str(names[x]) != truth and str(names[x]) != comp and str(types[x].__name__) != "str"):
+                    cols.append(str(names[x]))
+                    data_frame = data_frame.dropna(str(names[x]), how="any")
+            total_rows = data_frame.num_rows()
+            
+            for row in data_frame:
+                if (str(row[truth]) == str(row[comp])):
+                    num_matching = num_matching + 1
+
+            labels = data_frame[truth].unique()
+            for feature in features:
+                current_data = data_frame[str(feature)]
+                means[feature] = current_data.mean()
+                lbl_arry = []
+                label_outliers = []
+                index = 0
+                for label in labels:
+                    sub = data_frame[(data_frame[truth] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+
+                    sub = data_frame[(data_frame[comp] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+
+                outliers[feature] = label_outliers
+                boxplots[feature] = lbl_arry   
+            for label in labels:    
+                categories.append(str(label) + "_truth")   
+                categories.append(str(label) + "_comp")    
+        return render_template('pages/data/compare.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=names,
+            render_plot=render_plot,
+            features=features,
+            means=means,
+            boxplots=boxplots,
+            outliers=outliers,
+            labels=categories,
+            correct=num_matching,
+            incorrect=total_rows-num_matching,
+            types=types,
+            target=target,
+            cols=cols,
+            display_cols=display_cols)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
 @data_blueprint.route('/data_viz')
 @login_required  # Limits access to authenticated users
 def data_viz_page():
@@ -314,6 +488,297 @@ def data_details_page():
         db.session.add(error)
         db.session.commit()
         return redirect(request.referrer)
+
+@data_blueprint.route('/slice', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def slice_page():
+    # try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        data_frame = tc.load_sframe(my_data.sname)
+        form = TrainModelForm(request.form, obj=None)
+        means = {}
+        boxplots = {}
+        outliers = {}
+        distribution = []
+        labels = []
+        features = []
+        to_render = None
+        cols = data_frame.column_names()
+        types = data_frame.column_types()  
+
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+
+        if request.method == 'POST':
+            to_render = True
+            data_frame_cleaned = data_frame
+            for feature in request.form.getlist('features'):
+                data_frame_cleaned = data_frame_cleaned.dropna(str(feature), how="any")
+            data_frame_cleaned = data_frame_cleaned.dropna(str(request.form['label']), how="any")    
+            if data_frame_cleaned.num_rows() < 2:
+                flash('After cleaning, there is no data left. You have a data quality issue.', 'error')
+                return redirect(url_for('data.data_details_page', data_id=data_id))       
+                            
+            features = request.form.getlist('features')
+            target = request.form['label']
+            labels = data_frame_cleaned[target].unique()
+            for label in labels:
+                distribution.append({"name": label, "y": 0})
+            for row in data_frame:
+                for item in distribution:
+                    if row[target] == item['name']:
+                        item['y'] = item['y'] + 1
+
+            for feature in features:
+                current_data = data_frame_cleaned[str(feature)]
+                means[feature] = current_data.mean()
+                lbl_arry = []
+                label_outliers = []
+                index = 0
+                for label in labels:                    
+                    sub = data_frame_cleaned[(data_frame_cleaned[target] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+                    index = index + 1
+                outliers[feature] = label_outliers
+                boxplots[feature] = lbl_arry
+
+        return render_template('pages/data/slice.html',
+            my_data=my_data,
+            data_frame=data_frame,
+            labels=labels,
+            form=form,
+            features=features,
+            to_render=to_render,
+            means=means,
+            outliers=outliers,
+            boxplots=boxplots,
+            distribution=distribution,
+            names=cols,
+            types=types)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
+@data_blueprint.route('/view_cluster')
+@login_required  # Limits access to authenticated users
+def view_cluster_page():
+    # try:
+        cluster_id = request.args.get('cluster_id')
+        clstr = ClusterAnalysis.query.filter_by(id=cluster_id).first()
+        my_data = UserData.query.filter_by(id=clstr.data_id).first()
+        derived_data = UserData.query.filter_by(id=clstr.derived_data_id).first()
+        
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+
+
+        data_frame = tc.load_sframe(derived_data.sname)
+        labels = data_frame['label'].unique()
+        distribution = []
+        for label in labels:
+            distribution.append({"name": label, "y": 0})
+        for row in data_frame:
+            for item in distribution:
+                if row['label'] == item['name']:
+                    item['y'] = item['y'] + 1
+        cols = data_frame.column_names()
+        types = data_frame.column_types()
+
+        means = {}
+        boxplots = {}
+        outliers = {}
+        for feature in clstr.params["features"]:
+            current_data = data_frame[str(feature)]
+            means[feature] = current_data.mean()
+            lbl_arry = []
+            label_outliers = []
+            index = 0
+            for label in labels:
+                sub = data_frame[(data_frame['label'] == label)]
+                current_data = sub[str(feature)]
+                ncdata = current_data.to_numpy()
+                upper = np.percentile(ncdata,75)
+                lower = np.percentile(ncdata,25)
+                for item in ncdata:
+                    if item > upper or item < lower:
+                        label_outliers.append([int(index), item])                    
+                lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+                index = index + 1
+            boxplots[feature] = lbl_arry
+            outliers[feature] = label_outliers
+
+        return render_template('pages/data/clusters/cluster.html',
+            my_data=my_data,
+            data_frame=data_frame,
+            clstr=clstr,
+            labels=labels,
+            derived_data=derived_data,
+            means=means,
+            boxplots=boxplots,
+            outliers=outliers,
+            distribution=distribution,
+            names=cols,
+            types=types)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
+@data_blueprint.route('/cluster')
+@login_required  # Limits access to authenticated users
+def cluster_page():
+    try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        clusters = ClusterAnalysis.query.filter_by(data_id=data_id).all()
+        
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+
+        data_frame = tc.load_sframe(my_data.sname)
+        cols = data_frame.column_names()
+        types = data_frame.column_types()
+
+        return render_template('pages/data/clusters/clusters.html',
+            my_data=my_data,
+            data_frame=data_frame,
+            clusters=clusters,
+            names=cols,
+            types=types)
+    except Exception as e:
+        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+        error = ErrorLog()
+        error.user_id = current_user.id
+        error.error = str(e.__class__)
+        error.parameters = request.args
+        db.session.add(error)
+        db.session.commit()
+        return redirect(request.referrer)
+
+@data_blueprint.route('/new_cluster', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def new_cluster():
+    # try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+        form = UserDataForm(request.form, obj=None)
+        data_frame = tc.load_sframe(my_data.sname)
+        cols = data_frame.column_names()
+        types = data_frame.column_types()
+
+        if request.method == 'POST':
+            data_frame_cleaned = data_frame
+            cols = []
+            for feature in request.form.getlist('features'):
+                data_frame_cleaned = data_frame_cleaned.dropna(str(feature), how="any")
+                cols.append(str(feature))
+            if data_frame_cleaned.num_rows() < 2:
+                flash('After cleaning, there is no data left. You have a data quality issue.', 'error')
+                return redirect(url_for('data.new_cluster', data_id=data_id))       
+
+            my_model = None
+            if request.form['model_type'] == "dbscan":
+                radius = 1.0
+                min_core_neighbors = 10
+                if request.form['radius'] is not None:
+                    radius = request.form['radius']
+                if request.form['min_core_neighbors'] is not None:
+                    min_core_neighbors = request.form['min_core_neighbors']
+                my_model = tc.dbscan.create(data_frame_cleaned, radius=float(radius), min_core_neighbors=int(min_core_neighbors), features=cols)
+                my_model.summary()
+
+                values = [None]*data_frame_cleaned.num_rows()
+                types = [None]*data_frame_cleaned.num_rows()
+                for row in my_model.cluster_id:
+                    values[row['row_id']] = int(row['cluster_id'])
+                    types[row['row_id']] = row['type']
+
+                clstr = ClusterAnalysis()
+                clstr.project_id = my_data.project_id
+                clstr.user_id = current_user.id
+                clstr.name = request.form['name']
+                clstr.cluster_type = request.form['model_type']
+                clstr_data = safely_add_col("label", values, data_frame_cleaned)
+                clstr_data = safely_add_col("type", types, clstr_data)
+                clstr.data_id = data_id
+                clstr.derived_data_id = save_data(my_data, str(request.form['name']) + " cluster output", clstr_data)
+                clstr.params = {"min_core_neighbors": int(min_core_neighbors), "radius": float(radius), "features": cols}
+                db.session.add(clstr)
+                db.session.commit()                   
+                flash('Cluster analysis complete!', 'success')
+                return redirect(url_for('data.cluster_page', data_id=data_id))
+                              
+            else:    
+                num_clusters = 2
+                max_iterations = 10
+                if request.form['num_clusters'] is not None:
+                    num_clusters = request.form['num_clusters']
+                if request.form['max_iterations'] is not None:
+                    max_iterations = request.form['max_iterations']
+                my_model = tc.kmeans.create(data_frame_cleaned, num_clusters=int(num_clusters), max_iterations=int(max_iterations), features=cols)            
+                my_model.summary()
+
+                values = [None]*data_frame_cleaned.num_rows()
+                distances = [None]*data_frame_cleaned.num_rows()
+                for row in my_model.cluster_id:
+                    values[row['row_id']] = int(row['cluster_id'])
+                    distances[row['row_id']] = row['distance']
+
+                clstr = ClusterAnalysis()
+                clstr.project_id = my_data.project_id
+                clstr.user_id = current_user.id
+                clstr.name = request.form['name']
+                clstr.cluster_type = request.form['model_type']
+                clstr_data = safely_add_col("label", values, data_frame_cleaned)
+                clstr_data = safely_add_col("distance", distances, clstr_data)
+                clstr.data_id = data_id
+                clstr.derived_data_id = save_data(my_data, str(request.form['name']) + " cluster output", clstr_data)
+                clstr.params = {"num_clusters": int(num_clusters), "max_iterations": int(max_iterations), "features": cols}
+                db.session.add(clstr)
+                db.session.commit()   
+                flash('Cluster analysis complete!', 'success')
+                return redirect(url_for('data.cluster_page', data_id=data_id))
+
+        return render_template('pages/data/clusters/new.html',
+            my_data=my_data,
+            data_frame=data_frame,
+            form=form,
+            names=cols,
+            types=types)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @data_blueprint.route('/top')
 @login_required  # Limits access to authenticated users

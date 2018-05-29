@@ -20,13 +20,16 @@
                 <p>Number of Rows: {{my_data.num_rows}} / Number of Columns: {{my_data.num_cols}}</p>
 
 
-                <a href={{ url_for('data.top_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-file-text-o" aria-hidden="true"></i>
+                <a href={{ url_for('data.compare_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-window-restore" aria-hidden="true"></i>
+&nbsp;Compare</a> <a href={{ url_for('data.slice_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-scissors" aria-hidden="true"></i>
+&nbsp;Slice</a><a href={{ url_for('data.cluster_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-object-group" aria-hidden="true"></i>
+&nbsp;Cluster Analysis</a><a href={{ url_for('data.top_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-file-text-o" aria-hidden="true"></i>
 &nbsp;Top</a><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-code-fork" aria-hidden="true"></i>
 &nbsp;Transform</a><a href={{ url_for('data.analyze_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-bar-chart" aria-hidden="true"></i>
 &nbsp;Correlation</a><a href={{ url_for('data.scatter_analysis_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-line-chart" aria-hidden="true"></i>
 &nbsp;Scatter</a><a href={{ url_for('model.train_model_page', data_id=my_data.id) }} class="btn btn-success pull-right" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-random" aria-hidden="true"></i>
-&nbsp;Train Model</a><a href={{ url_for('data.data_quality_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-stethoscope" aria-hidden="true"></i>
-&nbsp;Data Quality</a><a href={{ url_for('data.csv_download', filename=filename, data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-cloud-download" aria-hidden="true"></i></i>
+&nbsp;Train</a><a href={{ url_for('data.data_quality_page', data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-stethoscope" aria-hidden="true"></i>
+&nbsp;Quality</a><a href={{ url_for('data.csv_download', filename=filename, data_id=my_data.id) }} class="btn btn-success pull-right d-none d-lg-inline" style="background: #1387b1; margin-left: 20px; border: #1387b1"><i class="fa fa-cloud-download" aria-hidden="true"></i></i>
 &nbsp;Download</a><br>
                 <div class="panel" style="padding-top: 30px;">
                     <div class="panel-body">

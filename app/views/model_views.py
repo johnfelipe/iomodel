@@ -102,7 +102,6 @@ def download(filename):
         root_dir = os.path.dirname(os.getcwd())
         direc = os.path.dirname(my_model.path)
         direc = os.path.join(direc, str(my_model.user_id))
-        print(direc)
         return send_from_directory(directory=direc, filename=str(my_model.name) + str(my_model.api_key) + "_model_cross_validation.csv")
     except Exception as e:
         flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')

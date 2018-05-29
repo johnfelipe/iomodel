@@ -146,7 +146,30 @@ class TrainedModel(db.Model):
         UserData,
         backref=db.backref('models',
                          uselist=True,
-                         cascade='delete,all'))    
+                         cascade='delete,all'))
+
+class ClusterAnalysis(db.Model):
+    __tablename__ = 'cluster_analysis'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    data_id = db.Column(db.Integer(), db.ForeignKey('users_data.id', ondelete='CASCADE'))
+    derived_data_id = db.Column(db.Integer())
+    project_id = db.Column(db.Integer(), db.ForeignKey('projects.id', ondelete='CASCADE'))
+    name = db.Column(db.Unicode(255), nullable=False, server_default=u'', unique=False)
+    cluster_type = db.Column(db.Unicode(30), nullable=False, server_default=u'', unique=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    params = db.Column(db.JSON)
+    project = db.relationship(
+        Project,
+        backref=db.backref('cluster_analysis',
+                         uselist=True,
+                         cascade='delete,all'))
+    data = db.relationship(
+        UserData,
+        backref=db.backref('cluster_analysis',
+                         uselist=True,
+                         cascade='delete,all'))   
+
 class Predictions(db.Model):
     __tablename__ = 'predictions'
     id = db.Column(db.Integer(), primary_key=True)

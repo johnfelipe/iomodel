@@ -1,0 +1,48 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('data.data_details_page', data_id=my_data.id) }}>{{my_data.name}}</a></li>
+  <li class="breadcrumb-item active">Cluster Analysis Reports</li>
+</ol>
+
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="card ">
+            <div class="card-header ">
+                <strong>Cluster Analysis - {{my_data.name}}</strong>
+            </div>
+            <div class="card-body ">
+              <a href={{ url_for('data.new_cluster', data_id=my_data.id) }} class="btn btn-success btn-sm pull-right" style="background: #1387b1; border: #1387b1">New Analysis</a><br><br>
+              <table class="table table-hover table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for cluster in clusters %} 
+                  <tr>
+                    <td><a href={{ url_for('data.view_cluster_page', cluster_id=cluster.id) }} >{{cluster.name}}</a></td>
+                    <td>{{cluster.cluster_type}}</td>
+                    <td>{{cluster.created_at}}</td>
+                    <tD><a href="{{ url_for('data.delete_cluster', cluster_id=cluster.id, data_id=my_data.id) }}"><i class="fa fa-remove"></i></a></tD>
+                  </tr>                          
+                  {% endfor %}                                                 
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer "></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('data.data_details_page', data_id=my_data.id) }}">{{my_data.name}}</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('data.cluster_page', data_id=my_data.id) }}">Cluster Analysis</a></li>
+  <li class="breadcrumb-item active">{{clstr.name}}</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="card ">
+      <div class="card-header ">
+        <strong>Cluster Analysis Summary for {{clstr.name}}</strong>
+      </div>
+      <div class="card-body ">
+        <p><b>Description:</b> {{derived_data.description}}</p>       
+        <p><b>Derived Data:</b><a href="{{ url_for('data.data_details_page', data_id=derived_data.id) }}"> {{derived_data.name}}</a></p>  
+        <div class="card ">
+          <div class="card-header ">
+            <strong>Cluster Label Distribution</strong>
+          </div>
+          <div class="card-body ">
+            <div id="container" style="min-width: 310px; height: 300px; max-width: 600px; margin: 0 auto"></div><br>
+          </div>
+          <div class="card-footer "></div>
+        </div>   
+        <div class="card ">
+          <div class="card-header ">
+            <strong>Cluster Data Distribution by Feature and Label</strong>
+          </div>
+          <div class="card-body ">
+            {% for feature in clstr.params["features"] %}
+            <div id="container_{{feature}}" style="height: 500px; margin: auto; min-width: 310px; max-width: 1000px"></div>
+            {% endfor %}
+          </div>
+          <div class="card-footer "></div>
+        </div>               
+
+      </div>
+      <div class="card-footer "></div>
+    </div>
+`</div>
+</div>
+
+<script>
+{% for feature in clstr.params["features"] %}
+Highcharts.chart('container_{{feature}}', {
+
+    chart: {
+        type: 'boxplot'
+    },
+    credits: {
+        enabled: false
+    },
+
+    title: {
+        text: 'Data Feature: {{feature}}'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    xAxis: {
+        categories: {{labels | safe}},
+        title: {
+            text: 'Experiment No.'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'Observations'
+        },
+        plotLines: [{
+            value: {{means[feature]}},
+            color: 'red',
+            width: 1,
+            label: {
+                text: 'Mean: {{means[feature]}}',
+                align: 'center',
+                style: {
+                    color: 'gray'
+                }
+            }
+        }]
+    },
+
+    series: [{
+        name: 'Observations',
+        data: {{boxplots[feature] | safe}},
+        tooltip: {
+            headerFormat: '<em>Experiment No {point.key}</em><br/>'
+        }
+    }, {
+        name: 'Outlier',
+        color: Highcharts.getOptions().colors[0],
+        type: 'scatter',
+        data: {{outliers[feature] | safe}},
+        marker: {
+            fillColor: 'white',
+            lineWidth: 1,
+            lineColor: Highcharts.getOptions().colors[0]
+        },
+        tooltip: {
+            pointFormat: 'Observation: {point.y}'
+        }
+    }]
+
+});
+{% endfor %}  
+
+Highcharts.chart('container', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    credits: {
+        enabled: false
+    },
+    title: {
+        text: 'Label Counts'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                }
+            }
+        }
+    },
+    series: [{
+        name: 'Labels',
+        colorByPoint: true,
+        data: {{distribution | safe}}
+    }]
+});    
+</script>
+{% endblock %}
