@@ -13,7 +13,7 @@ DEBUG = True
 SECRET_KEY = 'This is an UNSECURE Secret. CHANGE THIS for production environments.'
 
 # SQLAlchemy settings
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:password@localhost/iomodel'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:welcome@localhost/iomodel'
 #SQLALCHEMY_DATABASE_URI = 'sqlite:///../app.sqlite'
 SQLALCHEMY_TRACK_MODIFICATIONS = False    # Avoids a SQLAlchemy Warning
 
@@ -29,8 +29,8 @@ MAIL_PASSWORD = 'yourpassword'
 MAIL_DEFAULT_SENDER = '"You" <you@gmail.com>'
 
 ALLOWED_EXTENSIONS = set(['csv'])
-UPLOAD_FOLDER = '/home/YOUR_USER/iomodel/uploads'
-APP_FOLDER = '/home/YOUR_USER/iomodel/'
+UPLOAD_FOLDER = '/home/matt/projects/iomodel/uploads'
+APP_FOLDER = '/home/matt/projects/iomodel'
 
 ADMINS = [
     '"Admin One" <admin1@gmail.com>',

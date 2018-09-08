@@ -8,7 +8,6 @@ from flask_user import current_user, login_required, roles_accepted
 from werkzeug.utils import secure_filename
 import turicreate as tc
 from turicreate import SArray
-from cStringIO import StringIO
 import sys
 import numpy as np
 from scipy import stats as scipy_stats

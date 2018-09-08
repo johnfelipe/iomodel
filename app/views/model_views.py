@@ -7,8 +7,11 @@ from flask import request, url_for, flash, send_from_directory, jsonify, render_
 from flask_user import current_user, login_required, roles_accepted
 from werkzeug.utils import secure_filename
 import turicreate as tc
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from turicreate import SArray
-from cStringIO import StringIO
 import sys
 import numpy as np
 from scipy import stats as scipy_stats
@@ -417,7 +420,7 @@ def prediction_page():
 @model_blueprint.route('/predictions_step1', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def predictions_step1_page():
-    try:
+    # try:
         tc.config.set_num_gpus(0)
         model_id = request.args.get('model_id')
         my_model = TrainedModel.query.filter_by(id=model_id).first()
@@ -447,11 +450,11 @@ def predictions_step1_page():
             my_dict.input_file = my_data.name
             my_predictions = []
             for item in predictions:
-                my_predictions.append(item)
+                my_predictions.append(str(item))
             my_dict.predictions = my_predictions
             origs = []
             for item in data_frame[str(my_model.features['target'])]:
-                origs.append(item)
+                origs.append(str(item))
 
             # Make sure the predictions only overwrite blank values
             if request.form['mode'] == "fill":
@@ -473,20 +476,20 @@ def predictions_step1_page():
             my_data=my_data,
             my_model=my_model,
             form=form)
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @model_blueprint.route('/cross_validation')
 @login_required  # Limits access to authenticated users
 def cross_validation_page():
-    try:
+#    try:
         model_id = request.args.get('model_id')
         my_model = TrainedModel.query.filter_by(id=model_id).first()
         my_data = UserData.query.filter_by(id=my_model.data_id).first()
@@ -618,7 +621,7 @@ def cross_validation_page():
         else:
             total_correct = 0
             total_missed = 0
-            my_len = len(norig_data) - 1
+            my_len = len(norig_data)
             for x in range(0, my_len):
                 if (str(norig_data[x]), str(npredicted_data[x])) not in truth_table:
                     truth_table[(str(norig_data[x]), str(npredicted_data[x]))] = 1
@@ -648,7 +651,7 @@ def cross_validation_page():
                 results["accuracy"] = metrics.accuracy_score(norig_data, npredicted_data)
             except Exception as e:
                 results["accuracy"] = None
-            org_sa = tc.SArray(map(str, norig_data))
+
         filename = str(my_model.name) + str(my_model.api_key) + '_model_cross_validation.csv'
         return render_template('pages/models/cross_validation.html',
             my_data=my_data,
@@ -663,15 +666,15 @@ def cross_validation_page():
             variance=variance,
             sorted_variance=sorted_variance,
             examples=examples)
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @model_blueprint.route('/analytics')
 @login_required  # Limits access to authenticated users
@@ -779,7 +782,11 @@ def train_model_page():
             session_id = str(request.form['session_id'])
             time_field = str(request.form['time_field'])
             # data_frame = data_frame.sort(str(request.form['target']))
-
+            if model_type == 'svm':
+                label_count = data_frame[str(request.form['target'])].unique()
+                if len(label_count) > 2:
+                    flash('SVM only supports binary classification - try another method.', 'error')
+                    return redirect(request.referrer)
             if model_type != 'deep':
                 df = shuffle(data_frame.to_dataframe())
                 for y in range(0, 500):

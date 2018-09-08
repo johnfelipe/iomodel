@@ -1,4 +1,4 @@
-# ioModel Research Platform - v0.9.0
+# ioModel Research Platform - v0.9.5
 
 ![Screenshot](https://github.com/twintechlabs/iomodel/blob/master/app/static/images/screenshot.png)
 
@@ -19,7 +19,7 @@ ioModel is under active development, is in the early stages of release, and may 
 
 ## Code characteristics
 
-* Tested on Python 2.7
+* Tested on Python 3.6 and 2.7
 * Well organized directories with lots of comments
     * app
         * commands
@@ -128,7 +128,7 @@ With thanks to the following libraries - we all build on the shoulder's of giant
 * [Flask-Login](https://flask-login.readthedocs.io/)
 * [Flask-Migrate](https://flask-migrate.readthedocs.io/)
 * [Flask-Script](https://flask-script.readthedocs.io/)
-* [Flask-User](http://flask-user.readthedocs.io/en/v0.6/)
+* [Flask-User](http://flask-user.readthedocs.io/)
 
 ## Authors
 - Matt Hogan - matt AT twintechlabs DOT io

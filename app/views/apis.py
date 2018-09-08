@@ -7,7 +7,6 @@ from flask import request, url_for, flash, send_from_directory, jsonify, render_
 from flask_user import current_user, login_required, roles_accepted
 from werkzeug.utils import secure_filename
 import turicreate as tc
-from cStringIO import StringIO
 import sys
 import numpy as np
 from scipy import stats as scipy_stats

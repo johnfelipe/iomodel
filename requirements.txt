@@ -9,7 +9,8 @@ Flask-Login==0.4.1
 Flask-Migrate==2.0.2
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
-Flask-User==0.6.19
+Flask-BabelEx
+Flask-User
 Flask-WTF==0.14.1
 
 # Automated tests
@@ -26,5 +27,5 @@ turicreate==4.3.2
 scipy==1.0.0
 scikit-learn==0.19.1
 datetime==4.2.0
-psycopg2==2.7.3.2
+psycopg2-binary
 scikits.bootstrap==1.0.0

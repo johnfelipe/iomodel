@@ -24,7 +24,9 @@
               <label for="features">Select a Label (Category) to Slice By</label>
               <select class="form-control" id="label" required="true" name="label">
                 {% for x in range(0, names.__len__()) %}
+                  {% if types[x].__name__ == "str" %}
                    <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                  {% endif %}
                 {% endfor %}
               </select>
             </div>    

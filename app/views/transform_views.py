@@ -8,7 +8,10 @@ from flask_user import current_user, login_required, roles_accepted
 from werkzeug.utils import secure_filename
 import turicreate as tc
 from turicreate import SArray
-from cStringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import sys
 import numpy as np
 from scipy import stats as scipy_stats
@@ -597,7 +600,6 @@ def recode_step2_page():
             data_frame = safely_add_col(str(target) + '_uncoded', data_frame[str(target)], data_frame)
             for x in range(0, ntarget_data.__len__()):
                 mapped_values.append(str(request.form['new_value' + str(x)]))
-            print mapped_values
             cross_ref = []
             for x in range(0, names.__len__()):
                 if (str(types[x].__name__) == "str"):
@@ -606,7 +608,6 @@ def recode_step2_page():
             for field in norig_data:
                 for y in range(0, ntarget_data.__len__()):
                     if str(ntarget_data[y]) == str(field):
-                        print y
                         new_data.append(int(mapped_values[y]))
             sa = SArray(new_data)
             data_frame[str(target)] = sa
@@ -673,7 +674,7 @@ def remove_columns_page():
 @transforms_blueprint.route('/calculate_slope', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def calculate_slope_page():
-    try:
+    # try:
         data_id = request.args.get('data_id')
         my_data = UserData.query.filter_by(id=data_id).first()
         my_model = TrainedModel()
@@ -705,7 +706,7 @@ def calculate_slope_page():
             for name in data_frame.column_names():
                 if name not in features_str:
                     final_frame_vals[str(name)] = []
-            for key, value in featArrays.iteritems():
+            for key, value in featArrays.items():
                 if key in features_str:
                     final_frame_vals[str(key) + "_slope"] = []
                     final_frame_vals[str(key) + "_intercept"] = []
@@ -726,7 +727,7 @@ def calculate_slope_page():
                         if (str(name) not in features_str):
                             finalRow[str(name)] = row[str(name)]
                     xValArr = np.array(featArrays[xVal]).astype(np.float)
-                    for key, value in featArrays.iteritems():
+                    for key, value in featArrays.items():
                         if key != xVal:
                             yValArr = np.array(value).astype(np.float)
                             slope, intercept, r_value, p_value, std_err = linregress(xValArr, yValArr)
@@ -735,7 +736,7 @@ def calculate_slope_page():
                             if np.isnan(float(slope)) or np.isnan(float(intercept)):
                                 print("Got me a nan")
                     print(finalRow)
-                    for key, value in finalRow.iteritems():
+                    for key, value in finalRow.items():
                         final_frame_vals[str(key)].append(value)
                     final_frame_vals[str(target) + "_initial"].append(targetVal)
                     # Clear slope and static Xval accumulators
@@ -753,20 +754,20 @@ def calculate_slope_page():
             data_frame=data_frame,
             names=data_frame.column_names(),
             types=data_frame.column_types())
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @transforms_blueprint.route('/rolling_slope', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def rolling_slope_page():
-    try:
+    # try:
         data_id = request.args.get('data_id')
         my_data = UserData.query.filter_by(id=data_id).first()
         my_model = TrainedModel()
@@ -798,7 +799,7 @@ def rolling_slope_page():
             for name in data_frame.column_names():
                 if name not in features_str:
                     final_frame_vals[str(name)] = []
-            for key, value in featArrays.iteritems():
+            for key, value in featArrays.items():
                 if key in features_str:
                     final_frame_vals[str(key) + "_slope"] = []
                     final_frame_vals[str(key) + "_intercept"] = []
@@ -819,14 +820,14 @@ def rolling_slope_page():
                         if (str(name) not in features_str):
                             finalRow[str(name)] = row[str(name)]
                     xValArr = np.array(featArrays[xVal]).astype(np.float)
-                    for key, value in featArrays.iteritems():
+                    for key, value in featArrays.items():
                         if key != xVal:
                             yValArr = np.array(value).astype(np.float)
                             slope, intercept, r_value, p_value, std_err = linregress(xValArr, yValArr)
                             finalRow[key+"_slope"] = float(slope)
                             finalRow[key+"_intercept"] = float(intercept)
 
-                    for key, value in finalRow.iteritems():
+                    for key, value in finalRow.items():
                         final_frame_vals[str(key)].append(value)
                     final_frame_vals[str(target) + "_initial"].append(targetVal)
                 if x == size-1 or row[idField] != data_frame[x+1][idField]:
@@ -845,15 +846,15 @@ def rolling_slope_page():
             data_frame=data_frame,
             names=data_frame.column_names(),
             types=data_frame.column_types())
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @transforms_blueprint.route('/custom_transform', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users

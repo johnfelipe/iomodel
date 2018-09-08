@@ -195,7 +195,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {% for k, v in truth_table.iteritems() %}
+                                                    {% for k, v in truth_table.items() %}
                                                     <tr>
                                                         <td>{{k[0]}}</td>
                                                         <td>{{k[1]}}</td>
@@ -258,7 +258,7 @@
             }
         },
 
-        series: [        {% for k, v in truth_table.iteritems() %}
+        series: [        {% for k, v in truth_table.items() %}
             {
                 name: '({{k[0]}}, {{k[1]}})',
                 data: [{{v}}]
