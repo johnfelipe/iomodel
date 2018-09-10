@@ -1,0 +1,69 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+
+{% block content %}
+
+{% from "common/form_macros.html" import render_field, render_submit_field %}
+  <!-- Breadcrumb-->
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item">Connections</li>
+    <li class="breadcrumb-item active">Create Connection</li>
+    <!-- Breadcrumb Menu-->
+    <li class="breadcrumb-menu d-md-down-none">
+      <div class="btn-group" role="group" aria-label="Button group">
+        <a class="btn" href="#">
+          <i class="icon-speech"></i>
+        </a>
+        <a class="btn" href="./">
+          <i class="icon-graph"></i>  Dashboard</a>
+        <a class="btn" href="#">
+          <i class="icon-settings"></i>  Settings</a>
+      </div>
+    </li>
+  </ol>
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+        <form action="" method="POST" class="form" role="form">
+          <div class="card-header ">
+            <strong>Create Connection</strong>
+          </div>
+          <div class="card-body ">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label for="first_name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter a connection name" value="">
+                </div>
+                <div class="form-group">
+                  <label for="model_class">Select a Engine Type</label>
+                  <select class="form-control" required="true" id="engine_type" name="engine_type">
+                    <option value="postgresql">PostgreSQL</option>
+                    <option value="mysql">mySQL</option>
+                  </select>
+                </div>                
+                <div class="form-group">
+                    <label for="last_name">Host</label>
+                    <input type="text" class="form-control" id="host" name="host" placeholder="Enter a host name or IP address" value="">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">User</label>
+                    <input type="text" class="form-control" id="user" name="user" placeholder="Enter database user name" value="">
+                </div>                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" class="form-control" id="password" name="password" placeholder="Enter password" value="">
+                </div>
+                <div class="form-group">
+                    <label for="email">Database</label>
+                    <input type="text" class="form-control" id="db" name="db" placeholder="Enter the name of the database you wish to access" value="">
+                </div>
+          </div>
+          <div class="card-footer ">
+            <button type="submit " class="btn btn-sm btn-primary "><i class="fa fa-dot-circle-o "></i> Submit</button>
+            <button type="reset " class="btn btn-sm btn-danger "><i class="fa fa-ban "></i> Reset</button>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+{% endblock %}

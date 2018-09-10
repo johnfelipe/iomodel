@@ -117,6 +117,17 @@ class UserData(db.Model):
                          uselist=True,
                          cascade='delete,all'))
 
+class DBConn(db.Model):
+    __tablename__ = 'conns'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    name = db.Column(db.String(255), server_default='')
+    engine_type = db.Column(db.String(255), server_default='')
+    user = db.Column(db.String(255), server_default='')
+    password = db.Column(db.String(255), server_default='')
+    host = db.Column(db.String(255), server_default='')
+    db = db.Column(db.String(255), server_default='')
+
 class TrainedModel(db.Model):
     __tablename__ = 'models'
     id = db.Column(db.Integer(), primary_key=True)

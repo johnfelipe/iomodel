@@ -55,11 +55,13 @@ def create_app(extra_config_settings={}):
     from app.views.transform_views import transforms_blueprint
     from app.views.model_views import model_blueprint
     from app.views.apis import api_blueprint
+    from app.views.connection_views import conn_blueprint
     app.register_blueprint(main_blueprint)
     app.register_blueprint(api_blueprint)
     app.register_blueprint(data_blueprint)
     app.register_blueprint(model_blueprint)
     app.register_blueprint(transforms_blueprint)
+    app.register_blueprint(conn_blueprint)
     csrf_protect.exempt(api_blueprint)
     
     # Register blueprints

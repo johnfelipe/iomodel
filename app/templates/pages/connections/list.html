@@ -1,0 +1,67 @@
+{% extends "common/dark_base.html" %}  {# common/page_base.html extends layout.html #}
+
+{% block content %}
+
+{% from "common/form_macros.html" import render_field, render_submit_field %}
+
+  <!-- Breadcrumb-->
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item">Connections</li>
+    <!-- Breadcrumb Menu-->
+    <li class="breadcrumb-menu d-md-down-none">
+      <div class="btn-group" role="group" aria-label="Button group">
+        <a class="btn" href="#">
+          <i class="icon-speech"></i>
+        </a>
+        <a class="btn" href="./">
+          <i class="icon-graph"></i>  Dashboard</a>
+        <a class="btn" href="#">
+          <i class="icon-settings"></i>  Settings</a>
+      </div>
+    </li>
+  </ol>
+  <div class="container-fluid">
+    <div class="animated fadeIn">
+      <div class="card ">
+          <div class="card-header ">
+            <strong>System Connections</strong>
+            <a href="{{ url_for('connections.create_page') }}" class="btn btn-sm btn-primary pull-right">Create Connection</a>
+          </div>
+          <div class="card-body">
+            <table class="table table-hover table-striped table-bordered" style="padding-top: 50px;">
+              <thead>
+                <tr>
+                  <th style="width: 2%">Status</th>
+                  <th>Name</th>
+                  <th>Host</th>
+                  <th>User</th>
+                  <th>Database</th>
+                  <th>Engine</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for conn in conns %}
+                <tr>
+                  <td><center><img src="{{ url_for('static', filename = status[conn.id]) }}" width="10px" height="10px"></center></td>
+                  <td>{{conn.name}}</td>
+                  <td>{{conn.host}}</td>
+                  <td>{{conn.user}}</td>
+                  <td>{{conn.db}}</td>
+                  <td>{{conn.engine_type}}</td>
+                  <tD>
+                    <div class="btn-group" role="group" aria-label="...">
+                      <a href="{{ url_for('connections.delete', conn_id=conn.id) }}"><i class="fa fa-remove"></i></a>
+                    </div>
+                  </tD>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer "></div>
+      </div>
+  </div>
+</div>
+{% endblock %}
