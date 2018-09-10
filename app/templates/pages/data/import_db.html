@@ -1,7 +1,6 @@
 {% extends "common/dark_base.html" %}
 
 {% block content %}
-
 <ol class="breadcrumb">
   <li class="breadcrumb-item">Home</li>
   <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
@@ -14,17 +13,17 @@
       <div class="card ">
         <form action="" id="form" method="POST" class="form" role="form" enctype=multipart/form-data>
           <div class="card-header ">
-            <strong>Import DB</strong>
+            <strong>DB Import</strong>
           </div>
           <div class="card-body ">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                   <label for="name">Name</label>
-                  <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" placeholder="Enter a name">
+                  <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" value="{{name}}"placeholder="Enter a name">
                 </div>
                 <div class="form-group">
                   <label for="description">Description</label>
-                  <textarea class="form-control" required="true" id="description" name="description" rows="2"></textarea>
+                  <textarea class="form-control" required="true" id="description" name="description" rows="2">{{description}}</textarea>
                 </div>
                 <div class="form-group">
                   <label for="model_class">DB Connection</label>
@@ -35,7 +34,7 @@
                     {% endfor %}                      
                   </select>
                 </div>  
-                <div class="form-group">
+                <div class="form-group">   
                   <label for="model_class">Select a project for this data</label>
                   <select class="form-control" required="true" id="project_id" name="project_id">
                     <option value="">--- Please select a project ---</option>
@@ -43,12 +42,11 @@
                       <option value="{{proj.id}}">{{proj.name}}</option>
                     {% endfor %}                      
                   </select>
-                </div>                  
-                <div class="form-group">
-                  <label for="description">SQL</label>
-                  <textarea class="form-control" required="true" id="sql_text" name="sql_text" rows="7"></textarea>
-                </div>      
-        
+                </div>    
+                <div class="form-group">                 
+                  <label for="sql_text">Enter a valid SELECT statement below to extract a new data set</label>
+                  <textarea style="color: white; background-color: #484848" class="form-control" required="true" rows="10" name="sql_text" id="sql_text">{{sql_text}}</textarea>
+                </div>
           </div>
           <div class="card-footer ">
             <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Importing Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Import</button>                 
@@ -59,4 +57,10 @@
   </div>
 </div>
 
+<script>
+$(document).ready(function() {
+  $('#project_id').val('{{proj_id}}');
+  $('#dbconn').val('{{conn_id}}');
+});
+</script>
 {% endblock %}

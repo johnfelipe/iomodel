@@ -952,8 +952,31 @@ def db_import_page():
         my_projects = Project.query.filter_by(user_id=current_user.id).all()
         data = UserData()
         form = UserDataForm(request.form, obj=data)
+        sql_text = ""
+        name = ""
+        description = ""
+        conn_id = ""
+        proj_id = ""
 
         if request.method == 'POST':
+            sql_text = request.form['sql_text']
+            name = request.form['name']
+            description = request.form['description']
+            conn_id = request.form['dbconn']
+            proj_id = request.form['project_id']            
+            test_sql = request.form['sql_text'].lower()
+            if "delete" in test_sql or "alter" in test_sql or "update" in test_sql or "insert" in test_sql or "drop" in test_sql:
+                flash('Opps! Looks like you tried to execute illegal SQL.  Please clean up the query and try again.', 'error')
+                return render_template('pages/data/import_db.html',
+                                       project_id=project_id,
+                                       sql_text=sql_text,
+                                       name=name,
+                                       description=description,
+                                       conn_id=conn_id,
+                                       proj_id=proj_id,                                       
+                                       my_projects=my_projects,
+                                       my_connections=my_connections,
+                                       form=form)                
             form.populate_obj(data)
             data.user_id = current_user.id
             conn = DBConn.query.filter_by(id=request.form['dbconn']).first()
@@ -982,7 +1005,11 @@ def db_import_page():
             if sframe.num_rows() < 2:
                 flash('Opps! Looks like there is something wrong with your extract file. Please check the query and try again.', 'error')
                 return render_template('pages/data/import_db.html',
-                           form=form)
+                                       project_id=project_id,
+                                       sql_text=sql_text,
+                                       my_projects=my_projects,
+                                       my_connections=my_connections,
+                                       form=form)
             sname = os.path.join(pname, filename + "_sframe")
             sframe.save(sname)
             data.path = pname
@@ -1015,6 +1042,7 @@ def db_import_page():
             return redirect(url_for('data.data_details_page', data_id=data.id))
         return render_template('pages/data/import_db.html',
                                project_id=project_id,
+                               sql_text=sql_text,
                                my_projects=my_projects,
                                my_connections=my_connections,
                                form=form)
