@@ -17,9 +17,11 @@ import random
 import psycopg2
 
 from app import db
-from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, ErrorLog, StorageSlice, ClusterAnalysis
+from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, ErrorLog, StorageSlice, ClusterAnalysis, DBConn, Project
 import uuid, json, os
 import datetime
+from sqlalchemy import create_engine
+import csv
 
 def has_column(col_name, data_frame):
     cols = data_frame.column_names()
@@ -930,6 +932,91 @@ def data_import_page():
                            form=form)
         return render_template('pages/data/import.html',
                                project_id=project_id,
+                               form=form)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
+@data_blueprint.route('/db_import', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def db_import_page():
+    # try:
+        project_id = request.args.get('project_id')
+        my_connections = DBConn.query.filter_by(user_id=current_user.id).all()
+        my_projects = Project.query.filter_by(user_id=current_user.id).all()
+        data = UserData()
+        form = UserDataForm(request.form, obj=data)
+
+        if request.method == 'POST':
+            form.populate_obj(data)
+            data.user_id = current_user.id
+            conn = DBConn.query.filter_by(id=request.form['dbconn']).first()
+            engine = create_engine(conn.engine_type + '://' + conn.user + ':' + conn.password + '@'+ conn.host + '/' + conn.db)        
+            my_conn = engine.connect()
+            result = my_conn.execute(request.form['sql_text'])
+            print(result)
+            print(request.form['sql_text'])
+
+            filename = secure_filename(request.form['name'] + ".csv")
+            slice_name = find_slice()
+            pname = os.path.join(current_app.config['UPLOAD_FOLDER'], str(slice_name))
+            if not os.path.isdir(pname):
+                os.mkdir(pname)
+            pname = os.path.join(pname, str(current_user.id))
+            if not os.path.isdir(pname):
+                os.mkdir(pname)
+            fname = os.path.join(pname, filename)
+            column_names = result.keys()
+            fp = open(fname, "w+")
+            myFile = csv.writer(fp, lineterminator = '\n')
+            myFile.writerow(column_names)
+            myFile.writerows(result)
+            fp.close()            
+            sframe = tc.SFrame(data=fname)
+            if sframe.num_rows() < 2:
+                flash('Opps! Looks like there is something wrong with your extract file. Please check the query and try again.', 'error')
+                return render_template('pages/data/import_db.html',
+                           form=form)
+            sname = os.path.join(pname, filename + "_sframe")
+            sframe.save(sname)
+            data.path = pname
+            data.fname = fname
+            data.sname = sname
+            cols = sframe.column_names()
+            types = sframe.column_types()
+            stats = []
+
+            for x in range(0, cols.__len__()):
+                cdata_all = sframe[cols[x]]
+                data_frame_cleaned = sframe.dropna(str(cols[x]), how="all")
+                cdata = data_frame_cleaned[cols[x]]
+
+                missing = round(float(cdata_all.countna())/float(len(cdata_all)), 2) * 100
+                if (str(types[x].__name__) == "str"):
+                    stats.append({"min": "-", "max": "-", "mean": "-", "median": "-", "mode": "-", "std": "-", "var": "-", "sum": "-", "missing": missing})
+                else:
+                    ndata = cdata.to_numpy()
+                    ndata = np.array(ndata).astype(np.float)
+                    stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "missing": missing})
+
+            data.stats = stats
+            data.num_rows = sframe.num_rows()
+            data.num_cols = sframe.num_columns()
+            data.project_id = project_id
+            db.session.add(data)
+            db.session.commit()
+            flash('File has been imported!', 'success')
+            return redirect(url_for('data.data_details_page', data_id=data.id))
+        return render_template('pages/data/import_db.html',
+                               project_id=project_id,
+                               my_projects=my_projects,
+                               my_connections=my_connections,
                                form=form)
     # except Exception as e:
     #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')

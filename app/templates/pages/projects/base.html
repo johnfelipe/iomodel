@@ -13,7 +13,8 @@
     <div class="card ">
       <div class="card-header ">
         <strong>Data sets</strong>
-        <a href={{ url_for('data.data_import_page', project_id=my_project.id) }} class="btn btn-sm btn-primary pull-right" style="background: #1387b1; border: #1387b1">Import Data</a>
+        <a href={{ url_for('data.data_import_page', project_id=my_project.id) }} class="btn btn-sm btn-primary pull-right" style="background: #1387b1; border: #1387b1">Import CSV</a>
+        <a href={{ url_for('data.db_import_page', project_id=my_project.id) }} class="btn btn-sm btn-primary pull-right" style="background: #1387b1; margin-right: 10px; border: #1387b1">Import from DB</a>
       </div>
       <div class="card-body ">
         <table class="table table-hover table-striped">

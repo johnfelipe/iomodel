@@ -29,6 +29,7 @@ def connections_page():
             engine = create_engine(conn.engine_type + '://' + conn.user + ':' + conn.password + '@'+ conn.host + '/' + conn.db)        
             connection = engine.connect()
             status[conn.id] = "images/green.png"
+            connection.close()
         except Exception as e:
             status[conn.id] = "images/red.png"
             continue
