@@ -16,40 +16,69 @@
             <strong>DB Import</strong>
           </div>
           <div class="card-body ">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                  <label for="name">Name</label>
-                  <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" value="{{name}}"placeholder="Enter a name">
+            {{ form.hidden_tag() }}
+             <input type="hidden" id="action" name="action" value="submit">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" value="{{name}}"placeholder="Enter a name">
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" required="true" id="description" name="description" rows="2">{{description}}</textarea>
+            </div>
+            <div class="form-group">
+              <label for="model_class">DB Connection</label>
+              <select class="form-control" required="true" id="dbconn" name="dbconn">
+                <option value="">--- Please select a valid database connection ---</option>
+                {% for conn in my_connections %}
+                  <option value="{{conn.id}}">{{conn.name}} ({{conn.engine_type}})</option>
+                {% endfor %}                      
+              </select>
+            </div>  
+            <div class="form-group">   
+              <label for="model_class">Select a project for this data</label>
+              <select class="form-control" required="true" id="project_id" name="project_id">
+                <option value="">--- Please select a project ---</option>
+                {% for proj in my_projects %}
+                  <option value="{{proj.id}}">{{proj.name}}</option>
+                {% endfor %}                      
+              </select>
+            </div>    
+            <div class="form-group">                 
+              <label for="sql_text">Enter a valid SELECT statement below to extract a new data set</label>
+              <textarea style="color: white; background-color: #484848" class="form-control" required="true" rows="10" name="sql_text" id="sql_text">{{sql_text}}</textarea>
+            </div>
+            {% if view %}     
+             <div class="panel" style="padding-top: 10px;">
+                <div class="panel-body">
+                  <h5>Query Top 5 (out of {{total}})</h5>
+                  <table class="table table-hover table-striped table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Col Name</th>
+                        {% for x in range(0, max) %}
+                        <th>{{x+1}}</th>
+                        {% endfor %}                          
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for key in keys %}
+                       <tr>
+                        <td>{{key}}</td>
+                        {% for x in range(0, max) %}
+                        <td>{{view[key][x]}}</td>
+                        {% endfor %}                        
+                       </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
-                <div class="form-group">
-                  <label for="description">Description</label>
-                  <textarea class="form-control" required="true" id="description" name="description" rows="2">{{description}}</textarea>
-                </div>
-                <div class="form-group">
-                  <label for="model_class">DB Connection</label>
-                  <select class="form-control" required="true" id="dbconn" name="dbconn">
-                    <option value="">--- Please select a valid database connection ---</option>
-                    {% for conn in my_connections %}
-                      <option value="{{conn.id}}">{{conn.name}} ({{conn.engine_type}})</option>
-                    {% endfor %}                      
-                  </select>
-                </div>  
-                <div class="form-group">   
-                  <label for="model_class">Select a project for this data</label>
-                  <select class="form-control" required="true" id="project_id" name="project_id">
-                    <option value="">--- Please select a project ---</option>
-                    {% for proj in my_projects %}
-                      <option value="{{proj.id}}">{{proj.name}}</option>
-                    {% endfor %}                      
-                  </select>
-                </div>    
-                <div class="form-group">                 
-                  <label for="sql_text">Enter a valid SELECT statement below to extract a new data set</label>
-                  <textarea style="color: white; background-color: #484848" class="form-control" required="true" rows="10" name="sql_text" id="sql_text">{{sql_text}}</textarea>
-                </div>
+            </div>            
+            {% endif %} 
           </div>
           <div class="card-footer ">
-            <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Importing Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Import</button>                 
+            <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Importing Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Import</button>               
+            <button id="loading2" style="margin-left: 20px; display:none;" class="btn btn-sm btn-success" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Importing Data...</button><button type="submit" class="btn btn-sm btn-success" id="submit2" onclick="if ($('#form')[0].checkValidity() == true) { $('#action').val('test'); $('#submit2').toggle();$('#loading2').toggle(); }">Validate</button>                    
             <a class="btn btn-sm btn-danger" href="{{ url_for('main.my_project_page', project_id=project_id) }}"><i class="fa fa-ban "></i> Cancel</a>
           </div>
         </form>

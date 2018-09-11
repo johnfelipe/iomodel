@@ -965,87 +965,137 @@ def db_import_page():
             conn_id = request.form['dbconn']
             proj_id = request.form['project_id']            
             test_sql = request.form['sql_text'].lower()
-            if "delete" in test_sql or "alter" in test_sql or "update" in test_sql or "insert" in test_sql or "drop" in test_sql:
-                flash('Opps! Looks like you tried to execute illegal SQL.  Please clean up the query and try again.', 'error')
+
+            if request.form['action'] == "test":
+                
+                conn = DBConn.query.filter_by(id=request.form['dbconn']).first()
+                engine = create_engine(conn.engine_type + '://' + conn.user + ':' + conn.password + '@'+ conn.host + '/' + conn.db)        
+                my_conn = engine.connect()
+                result = my_conn.execute(request.form['sql_text'])
+    
+                keys = result.keys()
+                view = {}
+                for key in keys:
+                    view[key] = []
+                
+                for item in result:
+                    for key in keys:
+                        temp = view[key]
+                        print(temp)
+                        temp.append(item[key])
+                        print(temp)
+                        #view[key] = view[key].append(item[key])
+                max = result.rowcount
+                if max > 5:
+                    max = 5
+                flash('Query Executed - ' + str(result.rowcount) + ' rows returned', 'success')      
                 return render_template('pages/data/import_db.html',
                                        project_id=project_id,
                                        sql_text=sql_text,
+                                       sample=None,
+                                       view=view,
+                                       keys=keys,
+                                       max=max,
+                                       total=str(result.rowcount),
                                        name=name,
                                        description=description,
                                        conn_id=conn_id,
                                        proj_id=proj_id,                                       
                                        my_projects=my_projects,
                                        my_connections=my_connections,
-                                       form=form)                
-            form.populate_obj(data)
-            data.user_id = current_user.id
-            conn = DBConn.query.filter_by(id=request.form['dbconn']).first()
-            engine = create_engine(conn.engine_type + '://' + conn.user + ':' + conn.password + '@'+ conn.host + '/' + conn.db)        
-            my_conn = engine.connect()
-            result = my_conn.execute(request.form['sql_text'])
-            print(result)
-            print(request.form['sql_text'])
+                                       form=form)                   
+            else:
+                if "delete" in test_sql or "alter" in test_sql or "update" in test_sql or "insert" in test_sql or "drop" in test_sql:
+                    flash('Opps! Looks like you tried to execute illegal SQL.  Please clean up the query and try again.', 'error')
+                    return render_template('pages/data/import_db.html',
+                                           project_id=project_id,
+                                           sql_text=sql_text,
+                                           sample=None,
+                                           view= None,
+                                           name=name,
+                                           description=description,
+                                           conn_id=conn_id,
+                                           proj_id=proj_id,                                       
+                                           my_projects=my_projects,
+                                           my_connections=my_connections,
+                                           form=form)                
+                form.populate_obj(data)
+                data.user_id = current_user.id
+                conn = DBConn.query.filter_by(id=request.form['dbconn']).first()
+                engine = create_engine(conn.engine_type + '://' + conn.user + ':' + conn.password + '@'+ conn.host + '/' + conn.db)        
+                my_conn = engine.connect()
+                result = my_conn.execute(request.form['sql_text'])
+                filename = secure_filename(request.form['name'] + ".csv")
+                slice_name = find_slice()
+                pname = os.path.join(current_app.config['UPLOAD_FOLDER'], str(slice_name))
+                if not os.path.isdir(pname):
+                    os.mkdir(pname)
+                pname = os.path.join(pname, str(current_user.id))
+                if not os.path.isdir(pname):
+                    os.mkdir(pname)
+                fname = os.path.join(pname, filename)
+                column_names = result.keys()
+                fp = open(fname, "w+")
+                myFile = csv.writer(fp, lineterminator = '\n')
+                myFile.writerow(column_names)
+                myFile.writerows(result)
+                fp.close()            
+                sframe = tc.SFrame(data=fname)
+                if sframe.num_rows() < 2:
+                    flash('Opps! Looks like there is something wrong with your extract file. Please check the query and try again.', 'error')
+                    return render_template('pages/data/import_db.html',
+                                           project_id=project_id,
+                                           sql_text=sql_text,
+                                           name=name,
+                                           sample=None,
+                                           view=None,
+                                           description=description,
+                                           conn_id=conn_id,
+                                           proj_id=proj_id,                                       
+                                           my_projects=my_projects,
+                                           my_connections=my_connections,
+                                           form=form)   
+                sname = os.path.join(pname, filename + "_sframe")
+                sframe.save(sname)
+                data.path = pname
+                data.fname = fname
+                data.sname = sname
+                cols = sframe.column_names()
+                types = sframe.column_types()
+                stats = []
 
-            filename = secure_filename(request.form['name'] + ".csv")
-            slice_name = find_slice()
-            pname = os.path.join(current_app.config['UPLOAD_FOLDER'], str(slice_name))
-            if not os.path.isdir(pname):
-                os.mkdir(pname)
-            pname = os.path.join(pname, str(current_user.id))
-            if not os.path.isdir(pname):
-                os.mkdir(pname)
-            fname = os.path.join(pname, filename)
-            column_names = result.keys()
-            fp = open(fname, "w+")
-            myFile = csv.writer(fp, lineterminator = '\n')
-            myFile.writerow(column_names)
-            myFile.writerows(result)
-            fp.close()            
-            sframe = tc.SFrame(data=fname)
-            if sframe.num_rows() < 2:
-                flash('Opps! Looks like there is something wrong with your extract file. Please check the query and try again.', 'error')
-                return render_template('pages/data/import_db.html',
-                                       project_id=project_id,
-                                       sql_text=sql_text,
-                                       my_projects=my_projects,
-                                       my_connections=my_connections,
-                                       form=form)
-            sname = os.path.join(pname, filename + "_sframe")
-            sframe.save(sname)
-            data.path = pname
-            data.fname = fname
-            data.sname = sname
-            cols = sframe.column_names()
-            types = sframe.column_types()
-            stats = []
+                for x in range(0, cols.__len__()):
+                    cdata_all = sframe[cols[x]]
+                    data_frame_cleaned = sframe.dropna(str(cols[x]), how="all")
+                    cdata = data_frame_cleaned[cols[x]]
 
-            for x in range(0, cols.__len__()):
-                cdata_all = sframe[cols[x]]
-                data_frame_cleaned = sframe.dropna(str(cols[x]), how="all")
-                cdata = data_frame_cleaned[cols[x]]
+                    missing = round(float(cdata_all.countna())/float(len(cdata_all)), 2) * 100
+                    if (str(types[x].__name__) == "str"):
+                        stats.append({"min": "-", "max": "-", "mean": "-", "median": "-", "mode": "-", "std": "-", "var": "-", "sum": "-", "missing": missing})
+                    else:
+                        ndata = cdata.to_numpy()
+                        ndata = np.array(ndata).astype(np.float)
+                        stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "missing": missing})
 
-                missing = round(float(cdata_all.countna())/float(len(cdata_all)), 2) * 100
-                if (str(types[x].__name__) == "str"):
-                    stats.append({"min": "-", "max": "-", "mean": "-", "median": "-", "mode": "-", "std": "-", "var": "-", "sum": "-", "missing": missing})
-                else:
-                    ndata = cdata.to_numpy()
-                    ndata = np.array(ndata).astype(np.float)
-                    stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "missing": missing})
-
-            data.stats = stats
-            data.num_rows = sframe.num_rows()
-            data.num_cols = sframe.num_columns()
-            data.project_id = project_id
-            db.session.add(data)
-            db.session.commit()
-            flash('File has been imported!', 'success')
-            return redirect(url_for('data.data_details_page', data_id=data.id))
+                data.stats = stats
+                data.num_rows = sframe.num_rows()
+                data.num_cols = sframe.num_columns()
+                data.project_id = project_id
+                db.session.add(data)
+                db.session.commit()
+                flash('File has been imported!', 'success')
+                return redirect(url_for('data.data_details_page', data_id=data.id))
         return render_template('pages/data/import_db.html',
                                project_id=project_id,
                                sql_text=sql_text,
+                               name=name,
+                               sample=None,
+                               description=description,
+                               conn_id=conn_id,
+                               proj_id=proj_id,                                       
                                my_projects=my_projects,
                                my_connections=my_connections,
-                               form=form)
+                               form=form)   
     # except Exception as e:
     #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
     #     error = ErrorLog()
