@@ -1,12 +1,12 @@
-# ioModel Research Platform - v0.9.5
+# ioModel Research Platform - v1.0.0
 
 ![Screenshot](https://github.com/twintechlabs/iomodel/blob/master/app/static/images/screenshot.png)
 
-This is the core code base of the ioModel Research Platform. Essentially, ioModel provides a UI and
+This is the core code base of the ioModel Research Platform. ioModel provides a UI and
 an intuitive workflow on top of a number of common open source machine learning libraries including
 Apple's Turi Create, NumPy, ScyPi, and Scikit Learn.
 
-Today - ioModel allows you to import your data via CSV, analyze and transform the data, train machine
+Today - ioModel allows you to import your data via CSV and DB extract, analyze and transform the data, train machine
 learning models (classifiers and predictors currently supported), evaluate their performance, and 
 manage them as a deployed RESTful endpoint for integration into other systems.
 
