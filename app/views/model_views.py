@@ -566,7 +566,7 @@ def cross_validation_page():
             data_frame_cleaned = safely_add_col('Predicted_Value', predicted_scores, data_frame_cleaned)
             if my_model.features['model_class'] == "predictor":
                 for j in range(0, size):
-                    if  origs[j] is None:
+                    if  origs[j] is None or origs[j] == 0:
                         residuals.append(0)
                         residual_percent.append(0)
                     else:
