@@ -94,6 +94,7 @@
                         <strong>Training Data Summmary</strong>
                     </div>
                     <div class="card-body">
+                        <div id="model_training_summary" style="height: 200px; margin: 0 auto"></div>
                         <table class="table table-hover table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -103,6 +104,7 @@
                                     <th class="d-none d-lg-table-cell">Training Rows</th>
                                     <th class="d-none d-lg-table-cell">Test Rows</th>
                                     <th>Training Loss</th>
+                                    <th>Optimal Rows</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -113,6 +115,7 @@
                                     <td class="d-none d-lg-table-cell">{{my_model.features['training_rows']}}</td>
                                     <td class="d-none d-lg-table-cell">{{my_model.features['test_rows']}}</td>
                                     <td>{{my_model.features['training_loss'] | round(4)}}%</td>
+                                    <td>{{optimal_lower}} - {{optimal_upper}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -124,24 +127,29 @@
                         <strong>Model Performance</strong>
                     </div>
                     <div class="card-body">
+                        {% if my_model.features['model_class'] != "predictor" %}
+                            <div id="model_summary" style="height: 250px; margin: 0 auto"></div>
+                        {% endif %}
                         <table class="table table-hover table-striped table-bordered">
                             <thead>
                                 <tr>
                                     {% if my_model.features['model_class'] == "predictor" %}
-                                    <th>Max Error</th>
-                                    <th>RMSE</th>
-                                    {% else %} {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
-                                    <th>F1 Score</th>
-                                    <th>AUC</th>
-                                    <th>Recall</th>
-                                    <th>Precision</th>
-                                    <th>Accuracy</th>
-                                    {% else %}
-                                    <th>F1 Score</th>
-                                    <th>Recall</th>
-                                    <th>Precision</th>
-                                    <th>Accuracy</th>
-                                    {% endif %} {% endif %}
+                                        <th>Max Error</th>
+                                        <th>RMSE</th>
+                                    {% else %} 
+                                        {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
+                                            <th>F1 Score</th>
+                                            <th>AUC</th>
+                                            <th>Recall</th>
+                                            <th>Precision</th>
+                                            <th>Accuracy</th>
+                                        {% else %}
+                                            <th>F1 Score</th>
+                                            <th>Recall</th>
+                                            <th>Precision</th>
+                                            <th>Accuracy</th>
+                                        {% endif %} 
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -239,6 +247,154 @@ $('.btn').on('click', function() {
     var $this = $(this);
   $this.button('loading');
 });
+  Highcharts.chart("model_training_summary", {
+      chart: {
+          type: 'bar',
+          "backgroundColor":"#f0f3f5"
+      },
+      credits: {
+        enabled: false
+      },
+      colors: [
+          '#B16070',
+          '#628148',
+          '#0081af'
+      ],
+      title: {
+          text: 'Model Data Performance',
+          "style": { "color": "#000", "fontSize": "14px" }
+      },
+      xAxis: {
+          categories: ['Minimum', 'Optimal', 'Total Available'],
+          "style": { "color": "#000", "fontSize": "10px" },
+          labels: {
+              style: {
+                  color: '#000'
+              }
+          }
+      },
+      yAxis: {
+          min: 0,
+          title: {
+              text: '',
+              "style": { "color": "#000", "fontSize": "10px" }
+          },
+          labels: {
+            overflow: 'justify',
+            style: {
+                color: '#000'
+            }
+          }
+      },
+      legend: {
+          itemStyle: {
+               font: '9pt Roboto, sans-serif',
+               "color": "#000",
+               "style": { "color": "#000", "fontSize": "10px" }
+          },
+          itemHoverStyle: {
+               color: '#000'
+          },
+          itemHiddenStyle: {
+               color: '#444'
+          },
+          labels: {
+            style: {
+                color: '#000'
+            }
+          }
+      },
+      plotOptions: {
+          bar: {
+              dataLabels: {
+                  enabled: true,
+                  "color": '#000'
+              }
+          }
+      },
+      series: [{
+          name: 'Number of Observations',
+          colorByPoint: true,
+          data: [{{optimal_lower}}, {{optimal_upper}}, {{my_model.features['training_rows']}} ]
+      }]
+  });
+{% if my_model.features['model_class'] != "predictor" %}
+  Highcharts.chart("model_summary", {
+      chart: {
+          type: 'bar',
+          "backgroundColor":"#f0f3f5"
+      },
+      credits: {
+        enabled: false
+      },
+      title: {
+          text: 'Model Performance Summary',
+          "style": { "color": "#000", "fontSize": "14px" }
+      },
+      xAxis: {
+        {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
+            categories: ['F1 Score', 'AUC', 'Recall', 'Precision', 'Accuracy'],
+        {% else %}
+            categories: ['F1 Score', 'Recall', 'Precision', 'Accuracy'],
+        {% endif %}                 
+          "style": { "color": "#000", "fontSize": "10px" },
+          labels: {
+              style: {
+                  color: '#000'
+              }
+          }
+      },
+      yAxis: {
+          min: 0,
+          max: 1,
+          title: {
+              text: '',
+              "style": { "color": "#000", "fontSize": "10px" }
+          },
+          labels: {
+            overflow: 'justify',
+            style: {
+                color: '#000'
+            }
+          }
+      },
+      legend: {
+          itemStyle: {
+               font: '9pt Roboto, sans-serif',
+               "color": "#000",
+               "style": { "color": "#000", "fontSize": "10px" }
+          },
+          itemHoverStyle: {
+               color: '#000'
+          },
+          itemHiddenStyle: {
+               color: '#444'
+          },
+          labels: {
+            style: {
+                color: '#000'
+            }
+          }
+      },
+      plotOptions: {
+          bar: {
+              dataLabels: {
+                  enabled: true,
+                  "color": '#000'
+              }
+          }
+      },
+      series: [{
+          name: 'Probablity of Correctness',
+          color: "#0081af",
+        {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
+            data: [{{my_model.results["f1_score"] | round(4)}}, {{my_model.results["auc"] | round(4)}}, {{my_model.results["recall"] | round(4)}}, {{my_model.results["precision"] | round(4)}}, {{my_model.results["accuracy"] | round(4)}}]
+        {% else %}
+           data: [{{my_model.results["f1_score"] | round(4)}}, {{my_model.results["recall"] | round(4)}}, {{my_model.results["precision"] | round(4)}}, {{my_model.results["accuracy"] | round(4)}}]
+        {% endif %}                                   
+      }]
+  });
+{% endif %}
 Highcharts.chart('container_integ', {
     chart: {
         type: 'bar'
@@ -268,10 +424,12 @@ Highcharts.chart('container_integ', {
     },
     series: [{
         name: 'Included',
-        data: [{{included_rows}}]
+        data: [{{included_rows}}],
+        color: "#0081af"
     }, {
         name: 'Dropped',
-        data: [{{missing_rows}}]
+        data: [{{missing_rows}}],
+        color: "#ad0000"
     }]
 });
 {% if my_model.features['model_type'] != 'linear' and my_model.features['model_type'] != 'svm' %}
@@ -314,7 +472,8 @@ Highcharts.chart('container', {
     },
     series: [{
         name: 'Features',
-        data: {{imps|safe}}
+        data: {{imps|safe}},
+        color: "#0081af"
 
     }]
 });

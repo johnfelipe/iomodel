@@ -727,7 +727,7 @@ def model_analytics_page():
 @model_blueprint.route('/model_details')
 @login_required  # Limits access to authenticated users
 def model_details_page():
-    try:
+    # try:
         model_id = request.args.get('model_id')
         my_model = TrainedModel.query.filter_by(id=model_id).first()
         my_data = UserData.query.filter_by(id=my_model.data_id).first()
@@ -736,27 +736,30 @@ def model_details_page():
             return redirect(request.referrer)
         feats = []
         imps = []
-        print(my_model.results)
+        optimal_lower = len(my_model.features["features"])*10 
+        optimal_upper = len(my_model.features["features"])*20
         for item in my_model.features["importance"]:
             feats.append(str(item["name"]))
             imps.append(float(item["count"]))
         return render_template('pages/models/model_details.html',
             my_model=my_model,
             my_data=my_data,
+            optimal_lower=optimal_lower,
+            optimal_upper=optimal_upper,
             included_rows=(100-(float(my_model.features["training_loss"]))),
             missing_rows=float(my_model.features["training_loss"]),
             feats=feats,
             feat_len=len(my_model.features["features"]),
             imps=imps)
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @model_blueprint.route('/train_model', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users

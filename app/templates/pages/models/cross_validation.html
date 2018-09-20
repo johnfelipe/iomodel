@@ -615,10 +615,12 @@
             colorByPoint: true,
             data: [{
                 name: 'Correct',
-                y: {{to_render['accuracy']['total_correct']}}
+                y: {{to_render['accuracy']['total_correct']}},
+                color: "#0081af"
             }, {
                 name: 'Incorrect',
                 y: {{to_render['accuracy']['total_missed']}},
+                color: "#ad0000",
                 sliced: true,
                 selected: true
             }]
