@@ -68,6 +68,14 @@ Create a database for your app and then run:
     # Or if you have Fabric installed:
     fab init_db
 
+NOTE: There is currently a bug on Ubuntu 18.04 where you may see this error:
+
+    python3: Relink `/lib/x86_64-linux-gnu/libudev.so.1' with `/lib/x86_64-linux-gnu/librt.so.1' for IFUNC symbol `clock_gettime'
+    Segmentation fault
+
+If you do, run the following and then reinitialize the database:
+    sudo apt-get install python3-opencv
+
 ## Setting up paths for local data frame storage
 
 ioModel uses a database for managing users and relationships between models and data sets as well as for caching computationally expensive operations on immutable data. However, the file system is used to store raw data frames and a number of intermediary file types.

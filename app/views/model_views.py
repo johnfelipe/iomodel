@@ -784,6 +784,7 @@ def train_model_page():
             max_iterations = request.form['max_iterations']
             session_id = str(request.form['session_id'])
             time_field = str(request.form['time_field'])
+            my_model.mtype = model_type
             # data_frame = data_frame.sort(str(request.form['target']))
             if model_type == 'svm':
                 label_count = data_frame[str(request.form['target'])].unique()
@@ -818,6 +819,8 @@ def train_model_page():
                 flash('After cleaning, there is no data left. You have a data quality issue.', 'error')
                 return redirect(url_for('model.train_model_page', data_id=data_id))
             my_model.user_id = current_user.id
+            print("USER ID")
+            print(my_model.user_id)
             old_stdout = sys.stdout
             sys.stdout = mystdout = StringIO()
             training_loss = ((float(data_frame.num_rows()) - float(data_frame_cleaned.num_rows())) / float(data_frame.num_rows())) * 100
@@ -926,8 +929,9 @@ def train_model_page():
                     my_model.results = {'f1_score': nan_to_null(results['f1_score']), 'auc': "N/A", 'recall': nan_to_null(results['recall']), 'precision': nan_to_null(results['precision']), 'log_loss': "N/A", 'accuracy': nan_to_null(results['accuracy'])}
                 my_model.console = mystdout.getvalue()
             my_model.mname = os.path.join(my_model.path, str(my_model.api_key) + "_model")
-            tc_model.save(my_model.mname)
+            tc_model.save(my_model.mname)  
 
+            my_model.console = my_model.console.strip("\x00")
             db.session.add(my_model)
             db.session.commit()
             flash('Model has been saved!', 'success')
