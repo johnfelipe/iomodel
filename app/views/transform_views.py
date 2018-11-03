@@ -174,7 +174,7 @@ def classify_page():
             for data in norig_data:
                 appended = False 
                 for x in range(1, int(request.form['num_brackets'])+1):
-                    if float(data) >= float(request.form['lrange_' + str(x)]) and float(data) < float(request.form['urange_' + str(x)]):
+                    if float(data) >= float(request.form['lrange_' + str(x)]) and float(data) <= float(request.form['urange_' + str(x)]):
                         print(request.form['class_' + str(x)]) 
                         classes.append(request.form['class_' + str(x)])
                         appended = True
@@ -656,6 +656,43 @@ def remove_columns_page():
             flash('Data transform is sucessful!', 'success')
             return redirect(url_for('data.data_details_page', data_id=fwd_id))
         return render_template('pages/data/transforms/remove_columns.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=data_frame.column_names(),
+            types=data_frame.column_types())
+    except Exception as e:
+        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+        error = ErrorLog()
+        error.user_id = current_user.id
+        error.error = str(e.__class__)
+        error.parameters = request.args
+        db.session.add(error)
+        db.session.commit()
+        return redirect(request.referrer)
+
+@transforms_blueprint.route('/smote', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def smote_page():
+    try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
+
+        if request.method == 'POST':
+            features_utf = request.form.getlist('features')
+            features_str = []
+
+            for feat in features_utf:
+                features_str.append(str(feat))
+            sframe = data_frame.remove_columns(features_str)
+            fwd_id = save_data(my_data, request.form['name'], sframe)
+
+            flash('Data transform is sucessful!', 'success')
+            return redirect(url_for('data.data_details_page', data_id=fwd_id))
+        return render_template('pages/data/transforms/smote.html',
             my_data=my_data,
             form=form,
             data_frame=data_frame,
