@@ -16,6 +16,10 @@ import sys
 import numpy as np
 from scipy import stats as scipy_stats
 from scipy.stats import linregress
+from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
+import pandas as pd
 import math
 import psycopg2
 
@@ -674,22 +678,48 @@ def remove_columns_page():
 @transforms_blueprint.route('/smote', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def smote_page():
-    try:
+    # try:
         data_id = request.args.get('data_id')
         my_data = UserData.query.filter_by(id=data_id).first()
         my_model = TrainedModel()
         form = TrainModelForm(request.form, obj=my_model)
         data_frame = tc.load_sframe(my_data.sname)
-
+        data_frame_cleaned = data_frame
+        
         if request.method == 'POST':
             features_utf = request.form.getlist('features')
+            features_utf = request.form.getlist('features')
             features_str = []
+            variables = []
 
             for feat in features_utf:
                 features_str.append(str(feat))
-            sframe = data_frame.remove_columns(features_str)
-            fwd_id = save_data(my_data, request.form['name'], sframe)
+                variables.append(str(feat))
+                data_frame_cleaned = data_frame_cleaned.dropna(str(feat), how="any")
+            variables.append(str(request.form['target']))
+            df = shuffle(data_frame_cleaned.to_dataframe())
+ 
+            sm = SMOTE(random_state=12, ratio = 1.0)
+            x_res, y_res = sm.fit_sample(df[variables], df[str(request.form['target'])])
+            
+            my_dict = {}
+            np_y_res = np.array(y_res)
+            res = np_y_res.astype(str)
+            my_dict[str(request.form['target'])] = res
 
+            x=0
+            sf = tc.SFrame({ str(request.form['target']): y_res })
+            df = pd.DataFrame(x_res)
+            for feat in features_str:
+                dat = []
+                for val in df.ix[:, x]:
+                    dat.append(val)
+                sa = SArray(data=dat)
+                sf = sf.add_column(sa, feat)
+                x = x + 1
+            sa = SArray(data=y_res, dtype=str)    
+            sf = sf.add_column(sa, str(request.form['target']) + "_uncoded")
+            fwd_id = save_data(my_data, request.form['name'], sf)
             flash('Data transform is sucessful!', 'success')
             return redirect(url_for('data.data_details_page', data_id=fwd_id))
         return render_template('pages/data/transforms/smote.html',
@@ -698,15 +728,15 @@ def smote_page():
             data_frame=data_frame,
             names=data_frame.column_names(),
             types=data_frame.column_types())
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @transforms_blueprint.route('/calculate_slope', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users

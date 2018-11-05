@@ -25,7 +25,8 @@ pytest-cov==2.4.0
 numpy==1.14.0
 turicreate==4.3.2
 scipy==1.0.0
-scikit-learn==0.19.1
+scikit-learn
 datetime==4.2.0
 psycopg2-binary
-scikits.bootstrap==1.0.0
+scikits.bootstrap
+imblearn
