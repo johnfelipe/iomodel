@@ -675,17 +675,66 @@ def remove_columns_page():
         db.session.commit()
         return redirect(request.referrer)
 
-@transforms_blueprint.route('/smote', methods=['GET', 'POST'])
+@transforms_blueprint.route('/smote_step1', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
-def smote_page():
-    # try:
+def smote_step1():
+    try:
         data_id = request.args.get('data_id')
         my_data = UserData.query.filter_by(id=data_id).first()
         my_model = TrainedModel()
         form = TrainModelForm(request.form, obj=my_model)
         data_frame = tc.load_sframe(my_data.sname)
+        target = None
+        cols = []
+        display_cols = []
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+
+        for x in range(0, names.__len__()):
+            if (str(types[x].__name__) == "str"):
+                cols.append(str(names[x]))
+
+        if request.method == 'POST':
+            target = request.form['target']
+            return redirect(url_for('transforms.smote_page', data_id=my_data.id, target=target, name=request.form['name']))
+
+        return render_template('pages/data/transforms/smote_step1.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=names,
+            types=types,
+            target=target,
+            cols=cols)
+    except Exception as e:
+        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+        error = ErrorLog()
+        error.user_id = current_user.id
+        error.error = str(e.__class__)
+        error.parameters = request.args
+        db.session.add(error)
+        db.session.commit()
+        return redirect(request.referrer)
+
+@transforms_blueprint.route('/smote', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def smote_page():
+    # try:
+        data_id = request.args.get('data_id')
+        name = request.args.get('name')
+        target = request.args.get('target')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
         data_frame_cleaned = data_frame
-        
+
+        orig_data = data_frame[str(target)]
+        norig_data = orig_data.to_numpy()
+
+        target_data = data_frame[str(target)].unique()
+        ntarget_data = target_data.to_numpy()
+
         if request.method == 'POST':
             features_utf = request.form.getlist('features')
             features_utf = request.form.getlist('features')
@@ -699,7 +748,11 @@ def smote_page():
             variables.append(str(request.form['target']))
             df = shuffle(data_frame_cleaned.to_dataframe())
  
-            sm = SMOTE(random_state=12, ratio = 1.0)
+            strategy = {}
+            for x in range(0, ntarget_data.__len__()):
+                strategy[int(ntarget_data[x])] = int(request.form['new_value' + str(x)])
+
+            sm = SMOTE(random_state=12, sampling_strategy = strategy)
             x_res, y_res = sm.fit_sample(df[variables], df[str(request.form['target'])])
             
             my_dict = {}
@@ -726,6 +779,10 @@ def smote_page():
             my_data=my_data,
             form=form,
             data_frame=data_frame,
+            num_rows=data_frame.num_rows(),
+            name=name,
+            target=target,
+            ntarget_data=ntarget_data,
             names=data_frame.column_names(),
             types=data_frame.column_types())
     # except Exception as e:

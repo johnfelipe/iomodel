@@ -16,31 +16,29 @@
       <div class="card ">
         <form action="" id="form" method="POST" class="form" role="form">
           <div class="card-header ">
-            <strong>Create balanced training data coupled with a clean test set.</strong>
+            <strong>Step 2 of 2</strong>
           </div>
           <div class="card-body ">
               {{ form.hidden_tag() }}
               <input type="hidden" name="data_id" value="{{my_data.id}}">
+              <input type="hidden" name="name" value="{{name}}">   
+              <input type="hidden" name="target" value="{{target}}"> 
               <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" placeholder="Enter a name for the new data set">
-              </div>
+                <label for="features">Enter how many of each label in the final data set (each value must be greater than or equal to the total number of rows)</label>
+                {% for x in range(0, ntarget_data.__len__()) %}
+                  <div class="form-group">
+                    <label for="name">{{ntarget_data[x]}}</label>
+                    <input type="text" required="true" class="form-control" id="new_value{{x}}" name="new_value{{x}}" value="{{num_rows}}">
+                  </div>
+                {% endfor %}
+              </div>                         
               <div class="form-group">
-                <label for="target">Select a Target</label>
-                <select class="form-control" required="true" id="target" name="target">
-                  <option value="">--- Select a Target ---</option>
+                <label for="features">Select Features to Generate</label>
+                <select multiple class="form-control" required="true" id="features" name="features" style="height: 300px">
                   {% for x in range(0, names.__len__()) %}
                     {% if types[x].__name__ != "str" %}
-                    <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                      <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
                     {% endif %}
-                  {% endfor %}
-                </select>
-              </div>              
-              <div class="form-group">
-                <label for="features">Select One or More Columns to Remove</label>
-                <select multiple class="form-control" required="true" id="features" name="features" style="height: 500px">
-                  {% for x in range(0, names.__len__()) %}
-                  <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
                   {% endfor %}
                 </select>
               </div>

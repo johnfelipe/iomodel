@@ -8,7 +8,7 @@
   <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
   <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.name}}</a></li>
   <li class="breadcrumb-item"><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }}>Transforms</a></li>
-  <li class="breadcrumb-item active">Re-Code String Field (Step 1 of 2)</li>
+  <li class="breadcrumb-item active">Synthetic Minority Oversampling Technique</li>
 </ol>
 
   <div class="container-fluid">
@@ -16,22 +16,24 @@
       <div class="card ">
         <form action="" id="form" method="POST" class="form" role="form">
           <div class="card-header ">
-            <strong>Re-code a text field to numeric so you can develop a classifier model</strong>
+            <strong>Step 1 of 2</strong>
           </div>
           <div class="card-body ">
                 {{ form.hidden_tag() }}
                 <input type="hidden" name="data_id" value="{{my_data.id}}">
                 <div class="form-group">
-                  <label for="name">New Data Name</label>
+                  <label for="name">Name</label>
                   <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" placeholder="Enter a name for the new data set">
                 </div>
                 <div class="form-group">
                   <label for="target">Select Target Label</label>
-                  <select class="form-control" id="target" required name="target">
-                    <option value="">--- Select a field to transform ---</option>
-                  {% for x in range(0, cols.__len__()) %}
-                    <option value="{{cols[x]}}">{{cols[x]}} (str)</option>
-                  {% endfor %}
+                  <select class="form-control" required="true" id="target" name="target">
+                    <option value="">--- Select a Target ---</option>
+                    {% for x in range(0, names.__len__()) %}
+                      {% if types[x].__name__ != "str" %}
+                      <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                      {% endif %}
+                    {% endfor %}
                   </select>
                 </div>
           </div>
