@@ -19,6 +19,7 @@ from scipy.stats import linregress
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import ADASYN
 import pandas as pd
 import math
 import psycopg2
@@ -696,7 +697,8 @@ def smote_step1():
 
         if request.method == 'POST':
             target = request.form['target']
-            return redirect(url_for('transforms.smote_page', data_id=my_data.id, target=target, name=request.form['name']))
+            return redirect(url_for('transforms.smote_page', data_id=my_data.id, target=target, name=request.form['name'], seed=request.form['seed'], 
+                neighbors=request.form['neighbors'], algorithm=request.form['algorithm']))
 
         return render_template('pages/data/transforms/smote_step1.html',
             my_data=my_data,
@@ -723,6 +725,10 @@ def smote_page():
         data_id = request.args.get('data_id')
         name = request.args.get('name')
         target = request.args.get('target')
+        seed = request.args.get('seed')
+        algorithm = request.args.get('algorithm')
+        neighbors = request.args.get('neighbors')
+
         my_data = UserData.query.filter_by(id=data_id).first()
         my_model = TrainedModel()
         form = TrainModelForm(request.form, obj=my_model)
@@ -752,9 +758,19 @@ def smote_page():
             for x in range(0, ntarget_data.__len__()):
                 strategy[int(ntarget_data[x])] = int(request.form['new_value' + str(x)])
 
-            sm = SMOTE(random_state=12, sampling_strategy = strategy)
-            x_res, y_res = sm.fit_sample(df[variables], df[str(request.form['target'])])
-            
+            sm = None
+            y_res = None
+            x_res = None
+            try:
+                if algorithm == "SMOTE":
+                    sm = SMOTE(random_state=int(seed), sampling_strategy = strategy, k_neighbors=int(neighbors)-1)
+                else:
+                    sm = ADASYN(random_state=int(seed), sampling_strategy = strategy, n_neighbors=int(neighbors)-1)
+
+                x_res, y_res = sm.fit_sample(df[variables], df[str(request.form['target'])])
+            except Exception as e:
+                flash(str(e), 'error')
+                return redirect(request.referrer)
             my_dict = {}
             np_y_res = np.array(y_res)
             res = np_y_res.astype(str)

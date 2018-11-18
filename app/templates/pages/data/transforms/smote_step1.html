@@ -26,6 +26,21 @@
                   <input type="text" required="true" class="form-control" id="name" name="name" aria-describedby="name" placeholder="Enter a name for the new data set">
                 </div>
                 <div class="form-group">
+                  <label for="seed">Random Seed</label>
+                  <input type="numeric" required="true" class="form-control" id="seed" name="seed" aria-describedby="seed" value="1">
+                </div>    
+                <div class="form-group">
+                  <label for="neighbors">Number of Neighbors</label>
+                  <input type="numeric" required="true" class="form-control" id="neighbors" name="neighbors" aria-describedby="neighbors" value="5">
+                </div>   
+                <div class="form-group">
+                  <label for="algorithm">Select Algorithm to Use</label>
+                  <select class="form-control" required="true" id="algorithm" name="algorithm">
+                    <option value="SMOTE" default>SMOTE</option>
+                    <option value="ADASYN" default>ADASYN</option>
+                  </select>
+                </div>                                           
+                <div class="form-group">
                   <label for="target">Select Target Label</label>
                   <select class="form-control" required="true" id="target" name="target">
                     <option value="">--- Select a Target ---</option>

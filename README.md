@@ -1,4 +1,4 @@
-# ioModel Research Platform - v1.0.0
+# ioModel Research Platform - v1.1.0
 
 ![Screenshot](https://github.com/twintechlabs/iomodel/blob/master/app/static/images/screenshot.png)
 
@@ -9,6 +9,8 @@ Apple's Turi Create, NumPy, ScyPi, and Scikit Learn.
 Today - ioModel allows you to import your data via CSV and DB extract, analyze and transform the data, train machine
 learning models (classifiers and predictors currently supported), evaluate their performance, and 
 manage them as a deployed RESTful endpoint for integration into other systems.
+
+As of release 1.1.0, we've added support for over sampling imbalanced data sets using SMOTE and ADASYN from the imblearn API.
 
 Read more about it in the primer located here:
 http://twintechlabs.io/Twin%20Tech%20Labs%20Primer.pdf
