@@ -33,7 +33,7 @@ def create_users():
     admin_role = find_or_create_role('admin', u'Admin')
 
     # Add users
-    user = find_or_create_user(u'Matt', u'Hogan', u'matt@twintechlabs.io', 'Shirack1', admin_role)
+    user = find_or_create_user(u'Admin', u'User', u'admin@example.com', 'Password1', admin_role)
     user = find_or_create_user(u'Member', u'Example', u'member@example.com', 'Password1')
 
     sslice = find_or_create_slice(u'slice1')

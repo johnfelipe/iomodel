@@ -20,6 +20,21 @@ _local_cache = {}
 
 api_blueprint = Blueprint('api', __name__, template_folder='templates')
 
+def predict(request_json, model):
+    sf = tc.SFrame(request_json)
+    sf = sf.unpack('X1', column_name_prefix='')
+    predicted_scores = model['tc_model'].predict(sf)
+
+    if type(request_json) is not list:
+        run = ModelRun()
+        run.model_id = model['model_id']
+        run.parameters = request_json
+        run.prediction = str(predicted_scores[0])
+        db.session.add(run)
+        db.session.commit()    
+
+    return predicted_scores
+
 @api_blueprint.route('/predict', methods=['POST'])
 def predict_page():
     try:
@@ -33,21 +48,19 @@ def predict_page():
             tc_model = tc.load_model(my_model.mname)  
             _local_cache[api_key] = { 'model_id': my_model.id, 'tc_model': tc_model }
             model = { 'model_id': my_model.id, 'tc_model': tc_model }
-        sf = tc.SFrame([request.json])
-        sf = sf.unpack('X1', column_name_prefix='')
-        predicted_scores = model['tc_model'].predict(sf)
-        run = ModelRun()
-        run.model_id = model['model_id']
-        run.parameters = request.json
-        run.prediction = str(predicted_scores[0])
-        db.session.add(run)
-        db.session.commit()
 
-        ret = {"prediction": round(predicted_scores[0])}
+        ret = ""
+        if type(request.json) is not list:
+            predicted_scores = predict([request.json], model)
+            ret = {"prediction": round(predicted_scores[0])}
+        else:
+            predicted_scores = predict(request.json, model)
+            ret = {"predictions": np.around(predicted_scores.to_numpy()).tolist()}
+
         return(jsonify(ret), 200)  
     except Exception as e:
         error = ErrorLog()
-        error.user_id = current_user.id
+        error.user_id = -999
         error.error = str(e.__class__)
         error.parameters = request.args
         db.session.add(error)
