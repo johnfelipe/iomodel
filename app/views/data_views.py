@@ -311,6 +311,216 @@ def scatter_analysis_page():
         db.session.commit()
         return redirect(request.referrer)
 
+@data_blueprint.route('/anova', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def anova_page():
+        data_id = request.args.get('data_id')
+    # try:
+        my_data = UserData.query.filter_by(id=data_id).first()
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+        form = TrainModelForm(request.form, obj=None)
+        data_frame = tc.load_sframe(my_data.sname)
+        render_plot = False
+        target = None
+        cols = []
+        display_cols = []
+        features = []
+        categories = []
+        plot_data = []
+        means = {}
+        boxplots = {}
+        outliers = {}        
+        total_attrs = 0
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+        num_matching = 0
+        total_rows = 0
+
+        if request.method == 'POST':
+            render_plot = True
+            truth = request.form['truth']
+            comp = request.form['comp']
+            features = request.form.getlist('features')
+            data_frame = tc.load_sframe(my_data.sname)
+            data_frame = data_frame.dropna(str(truth), how="any")
+            data_frame = data_frame.dropna(str(comp), how="any")
+            for x in range(0, names.__len__()):
+                if (str(names[x]) != truth and str(names[x]) != comp and str(types[x].__name__) != "str"):
+                    cols.append(str(names[x]))
+                    data_frame = data_frame.dropna(str(names[x]), how="any")
+            total_rows = data_frame.num_rows()
+            
+            for row in data_frame:
+                if (str(row[truth]) == str(row[comp])):
+                    num_matching = num_matching + 1
+
+            labels = data_frame[truth].unique()
+            for feature in features:
+                current_data = data_frame[str(feature)]
+                means[feature] = current_data.mean()
+                lbl_arry = []
+                label_outliers = []
+                index = 0
+                for label in labels:
+                    sub = data_frame[(data_frame[truth] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+
+                    sub = data_frame[(data_frame[comp] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+
+                outliers[feature] = label_outliers
+                boxplots[feature] = lbl_arry   
+            for label in labels:    
+                categories.append(str(label) + "_truth")   
+                categories.append(str(label) + "_comp")    
+        return render_template('pages/data/anova.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=names,
+            render_plot=render_plot,
+            features=features,
+            means=means,
+            boxplots=boxplots,
+            outliers=outliers,
+            labels=categories,
+            correct=num_matching,
+            incorrect=total_rows-num_matching,
+            types=types,
+            target=target,
+            cols=cols,
+            display_cols=display_cols)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
+@data_blueprint.route('/ganova', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def ganova_page():
+        data_id = request.args.get('data_id')
+    # try:
+        my_data = UserData.query.filter_by(id=data_id).first()
+        if my_data.user_id is not current_user.id:
+            flash('Opps!  Do data found', 'error')
+            return redirect(request.referrer)
+        form = TrainModelForm(request.form, obj=None)
+        data_frame = tc.load_sframe(my_data.sname)
+        render_plot = False
+        target = None
+        cols = []
+        display_cols = []
+        features = []
+        categories = []
+        plot_data = []
+        means = {}
+        boxplots = {}
+        outliers = {}        
+        total_attrs = 0
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+        num_matching = 0
+        total_rows = 0
+
+        if request.method == 'POST':
+            render_plot = True
+            truth = request.form['truth']
+            comp = request.form['comp']
+            features = request.form.getlist('features')
+            data_frame = tc.load_sframe(my_data.sname)
+            data_frame = data_frame.dropna(str(truth), how="any")
+            data_frame = data_frame.dropna(str(comp), how="any")
+            for x in range(0, names.__len__()):
+                if (str(names[x]) != truth and str(names[x]) != comp and str(types[x].__name__) != "str"):
+                    cols.append(str(names[x]))
+                    data_frame = data_frame.dropna(str(names[x]), how="any")
+            total_rows = data_frame.num_rows()
+            
+            for row in data_frame:
+                if (str(row[truth]) == str(row[comp])):
+                    num_matching = num_matching + 1
+
+            labels = data_frame[truth].unique()
+            for feature in features:
+                current_data = data_frame[str(feature)]
+                means[feature] = current_data.mean()
+                lbl_arry = []
+                label_outliers = []
+                index = 0
+                for label in labels:
+                    sub = data_frame[(data_frame[truth] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+
+                    sub = data_frame[(data_frame[comp] == label)]
+                    current_data = sub[str(feature)]
+                    ncdata = current_data.to_numpy()
+                    upper = np.percentile(ncdata,75)
+                    lower = np.percentile(ncdata,25)
+                    for item in ncdata:
+                        if item > upper or item < lower:
+                            label_outliers.append([int(index), item])                    
+                    lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+
+                outliers[feature] = label_outliers
+                boxplots[feature] = lbl_arry   
+            for label in labels:    
+                categories.append(str(label) + "_truth")   
+                categories.append(str(label) + "_comp")    
+        return render_template('pages/data/ganova.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=names,
+            render_plot=render_plot,
+            features=features,
+            means=means,
+            boxplots=boxplots,
+            outliers=outliers,
+            labels=categories,
+            correct=num_matching,
+            incorrect=total_rows-num_matching,
+            types=types,
+            target=target,
+            cols=cols,
+            display_cols=display_cols)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
 @data_blueprint.route('/compare', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def compare_page():

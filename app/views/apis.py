@@ -52,10 +52,10 @@ def predict_page():
         ret = ""
         if type(request.json) is not list:
             predicted_scores = predict([request.json], model)
-            ret = {"prediction": round(predicted_scores[0])}
+            ret = {"prediction": round(predicted_scores[0], 2)}
         else:
             predicted_scores = predict(request.json, model)
-            ret = {"predictions": np.around(predicted_scores.to_numpy()).tolist()}
+            ret = {"predictions": np.around(predicted_scores.to_numpy(), 2).tolist()}
 
         return(jsonify(ret), 200)  
     except Exception as e:

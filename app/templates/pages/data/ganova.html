@@ -1,0 +1,187 @@
+{% extends "common/dark_base.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li class="breadcrumb-item">Home</li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
+  <li class="breadcrumb-item"><a href={{ url_for('data.data_details_page', data_id=my_data.id) }}>{{my_data.name}}</a></li>
+  <li class="breadcrumb-item active">ANOVA (between variables)</li>
+</ol>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="card ">
+    <form action="" id="form" method="POST" class="form" role="form">
+      <div class="card-header ">
+        <strong>ANOVA between groups</strong>
+      </div>
+      <div class="card-body ">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="data_id" value="{{my_data.id}}">
+
+        <div class="form-group">
+          <label for="features">Select Variable</label>
+          <select class="form-control" id="var1" required="true" name="var1">
+          	<option value="">--- Select a Variable ---</option>
+            {% for x in range(0, names.__len__()) %}
+               <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+            {% endfor %}
+          </select>
+        </div>    
+
+        <div class="form-group">
+          <label for="features">Select a Group Variable</label>
+          <select class="form-control" id="group" required="true" name="group">
+          	<option value="">--- Select a Categorical ---</option>
+            {% for x in range(0, names.__len__()) %}
+               <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+            {% endfor %}
+          </select>
+        </div>    
+
+      </div>
+      <div class="card-footer ">
+        <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-sm btn-primary" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Analyzing Data...</button><button type="submit" class="btn btn-sm btn-primary" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Analyze</button>                 
+        <a class="btn btn-sm btn-danger" href="{{ url_for('data.data_details_page', data_id=my_data.id) }}"><i class="fa fa-ban "></i> Cancel</a>
+      </div>
+    </form>
+    </div>    
+    {% if render_plot == True %}
+        <div class="card ">
+          <div class="card-header ">
+            <strong>Results</strong>
+          </div>
+          <div class="card-body ">
+            <div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            {% for feature in features %}
+            <div class="card ">
+              <div class="card-header ">
+                <strong>Feature: {{feature}}</strong>
+              </div>
+              <div class="card-body ">
+                <div id="container_{{feature}}" style="height: 500px; margin: auto; min-width: 310px; max-width: 1000px"></div>
+              </div>
+              <div class="card-footer "></div>
+            </div>              
+            {% endfor %}
+          </div>
+          <div class="card-footer "></div>
+        </div>               
+    {% endif %}    
+
+`</div>
+</div>
+
+<script>
+{% if render_plot == True %}
+{% for feature in features %}
+Highcharts.chart('container_{{feature}}', {
+
+    chart: {
+        type: 'boxplot'
+    },
+    credits: {
+        enabled: false
+    },
+
+    title: {
+        text: 'Data Feature: {{feature}}'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    xAxis: {
+        categories: {{labels | safe}},
+        title: {
+            text: 'Experiment No.'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'Observations'
+        },
+        plotLines: [{
+            value: {{means[feature]}},
+            color: 'red',
+            width: 1,
+            label: {
+                text: 'Mean: {{means[feature]}}',
+                align: 'center',
+                style: {
+                    color: 'gray'
+                }
+            }
+        }]
+    },
+
+    series: [{
+        name: 'Observations',
+        data: {{boxplots[feature] | safe}},
+        tooltip: {
+            headerFormat: '<em>Experiment No {point.key}</em><br/>'
+        }
+    }, {
+        name: 'Outlier',
+        color: Highcharts.getOptions().colors[0],
+        type: 'scatter',
+        data: {{outliers[feature] | safe}},
+        marker: {
+            fillColor: 'white',
+            lineWidth: 1,
+            lineColor: Highcharts.getOptions().colors[0]
+        },
+        tooltip: {
+            pointFormat: 'Observation: {point.y}'
+        }
+    }]
+
+});
+{% endfor %}     
+Highcharts.chart('container', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Percent of Matching Labels'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                }
+            }
+        }
+    },
+    series: [{
+        name: 'Brands',
+        colorByPoint: true,
+        data: [{
+            name: 'Correct',
+            y: {{correct}},
+            sliced: true,
+            selected: true
+        }, {
+            name: 'Incorrect',
+            y: {{incorrect}}
+        }]
+    }]
+});
+{% endif %}
+</script>
+{% endblock %}
