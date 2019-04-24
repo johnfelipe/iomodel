@@ -26,7 +26,13 @@
           <select class="form-control" id="var1" required="true" name="var1">
           	<option value="">--- Select a Variable ---</option>
             {% for x in range(0, names.__len__()) %}
-               <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+              {% if types[x].__name__ != "str" %}
+                {% if names[x] == display_data['var1'] %}
+                  <option value="{{names[x]}}" selected>{{names[x]}} ({{types[x].__name__}})</option>
+                {% else %}
+                  <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                {% endif %}
+              {% endif %}            
             {% endfor %}
           </select>
         </div>    
@@ -36,7 +42,13 @@
           <select class="form-control" id="comp" required="true" name="comp">
           	<option value="">--- Select a Comparisson Variable ---</option>
             {% for x in range(0, names.__len__()) %}
-               <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+              {% if types[x].__name__ != "str" %}
+                {% if names[x] == display_data['comp']  %}
+                  <option value="{{names[x]}}" selected>{{names[x]}} ({{types[x].__name__}})</option>
+                {% else %}
+                  <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                {% endif %}
+              {% endif %}
             {% endfor %}
           </select>
         </div>    
@@ -54,18 +66,26 @@
             <strong>Results</strong>
           </div>
           <div class="card-body ">
-            <div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
-            {% for feature in features %}
-            <div class="card ">
-              <div class="card-header ">
-                <strong>Feature: {{feature}}</strong>
-              </div>
-              <div class="card-body ">
-                <div id="container_{{feature}}" style="height: 500px; margin: auto; min-width: 310px; max-width: 1000px"></div>
-              </div>
-              <div class="card-footer "></div>
-            </div>              
-            {% endfor %}
+                <table class="table table-hover table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th class="d-none d-lg-table-cell"></th>
+                      <th class="d-none d-lg-table-cell"></th>
+                      <th class="d-none d-lg-table-cell"></th>
+                      <th class="d-none d-lg-table-cell">f statistic</th>
+                      <th class="d-none d-lg-table-cell">P Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="d-none d-lg-table-cell">{{display_data["f"]}}</td>
+                    <td class="d-none d-lg-table-cell">{{display_data["P"]}}</td>
+                  </tr>
+                  </tbody>
+                </table>
           </div>
           <div class="card-footer "></div>
         </div>               
@@ -76,112 +96,7 @@
 
 <script>
 {% if render_plot == True %}
-{% for feature in features %}
-Highcharts.chart('container_{{feature}}', {
 
-    chart: {
-        type: 'boxplot'
-    },
-    credits: {
-        enabled: false
-    },
-
-    title: {
-        text: 'Data Feature: {{feature}}'
-    },
-
-    legend: {
-        enabled: false
-    },
-
-    xAxis: {
-        categories: {{labels | safe}},
-        title: {
-            text: 'Experiment No.'
-        }
-    },
-
-    yAxis: {
-        title: {
-            text: 'Observations'
-        },
-        plotLines: [{
-            value: {{means[feature]}},
-            color: 'red',
-            width: 1,
-            label: {
-                text: 'Mean: {{means[feature]}}',
-                align: 'center',
-                style: {
-                    color: 'gray'
-                }
-            }
-        }]
-    },
-
-    series: [{
-        name: 'Observations',
-        data: {{boxplots[feature] | safe}},
-        tooltip: {
-            headerFormat: '<em>Experiment No {point.key}</em><br/>'
-        }
-    }, {
-        name: 'Outlier',
-        color: Highcharts.getOptions().colors[0],
-        type: 'scatter',
-        data: {{outliers[feature] | safe}},
-        marker: {
-            fillColor: 'white',
-            lineWidth: 1,
-            lineColor: Highcharts.getOptions().colors[0]
-        },
-        tooltip: {
-            pointFormat: 'Observation: {point.y}'
-        }
-    }]
-
-});
-{% endfor %}     
-Highcharts.chart('container', {
-    chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie'
-    },
-    title: {
-        text: 'Percent of Matching Labels'
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                style: {
-                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                }
-            }
-        }
-    },
-    series: [{
-        name: 'Brands',
-        colorByPoint: true,
-        data: [{
-            name: 'Correct',
-            y: {{correct}},
-            sliced: true,
-            selected: true
-        }, {
-            name: 'Incorrect',
-            y: {{incorrect}}
-        }]
-    }]
-});
 {% endif %}
 </script>
 {% endblock %}

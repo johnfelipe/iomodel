@@ -328,6 +328,9 @@ def anova_page():
         display_cols = []
         names=data_frame.column_names()
         types=data_frame.column_types()
+        display_data = {}
+        display_data['var1'] = ""
+        display_data['comp'] = ""
 
         if request.method == 'POST':
             render_plot = True
@@ -343,10 +346,16 @@ def anova_page():
             f, P = scipy_stats.f_oneway(var1_arr.to_numpy(), comp_arr.to_numpy())
             print(f)
             print(P)
+            display_data['P'] = P
+            display_data['f'] = f
+            display_data['var1'] = var1
+            display_data['comp'] = comp
+
         return render_template('pages/data/anova.html',
             my_data=my_data,
             form=form,
             data_frame=data_frame,
+            display_data=display_data,
             names=names,
             types=types,
             render_plot=render_plot,
@@ -379,25 +388,46 @@ def ganova_page():
         display_cols = []
         names=data_frame.column_names()
         types=data_frame.column_types()
+        display_data = {}
+        display_data['var1'] = ""
+        display_data['group'] = ""
 
         if request.method == 'POST':
             render_plot = True
             var1 = request.form['var1']
-            comp = request.form['comp']
+            group = request.form['group']
             data_frame = tc.load_sframe(my_data.sname)
             data_frame = data_frame.dropna(str(var1), how="any")
-            data_frame = data_frame.dropna(str(comp), how="any")
+            data_frame = data_frame.dropna(str(group), how="any")
             var1_arr = data_frame.select_column(str(var1))
-            comp_arr = data_frame.select_column(str(comp))
-            print(var1_arr)
+            group_scores = {}
+            for grp in data_frame[str(group)].unique():
+                group_scores[str(grp)] = []
+                print(grp)
+            print(group_scores)
+            for item in data_frame:
+                curr = group_scores[ str(item[str(group)]) ]
+                curr.append(item[str(var1)])
+                group_scores[ str(item[str(group)]) ] = curr
+            comp_arr = []
+            for grp in data_frame[str(group)].unique():
+                print(grp)
+                group_scores[str(grp)]
+                print(group_scores[str(grp)])
+                comp_arr.append(np.asarray(group_scores[str(grp)]))
             print(comp_arr)
-            f, P = scipy_stats.f_oneway(var1_arr.to_numpy(), comp_arr.to_numpy())
+            f, P = scipy_stats.f_oneway(*comp_arr)
             print(f)
             print(P)
+            display_data['P'] = P
+            display_data['f'] = f
+            display_data['var1'] = var1
+            display_data['group'] = group            
         return render_template('pages/data/ganova.html',
             my_data=my_data,
             form=form,
             data_frame=data_frame,
+            display_data=display_data,
             names=names,
             types=types,
             render_plot=render_plot,

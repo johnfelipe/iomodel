@@ -8,3 +8,4 @@ RELEASE NOTES
 4. Changed data action list to alphabetical
 5. Added ANOVA
 6. Fixed bug in prediction API that was rounding results to a whole number
+7. Minor UI bug fixes
