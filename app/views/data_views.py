@@ -341,11 +341,27 @@ def anova_page():
             data_frame = data_frame.dropna(str(comp), how="any")
             var1_arr = data_frame.select_column(str(var1))
             comp_arr = data_frame.select_column(str(comp))
-            print(var1_arr)
-            print(comp_arr)
+            group_scores = { var1: var1_arr, comp: comp_arr}
             f, P = scipy_stats.f_oneway(var1_arr.to_numpy(), comp_arr.to_numpy())
-            print(f)
-            print(P)
+
+            lbl_arry = []
+            label_outliers = []
+            index = 0
+            grps = [var1, comp]
+            for grp in grps:                   
+                ncdata = np.array( group_scores[str(grp)] )
+                upper = np.percentile(ncdata,75)
+                lower = np.percentile(ncdata,25)
+                for item in ncdata:
+                    if item > upper or item < lower:
+                        label_outliers.append([int(index), item])                    
+                lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+                index = index + 1
+
+            display_data['outliers'] = label_outliers
+            display_data['boxplots'] = lbl_arry
+            display_data['labels'] = grps
+            display_data['mean'] = var1_arr.mean()                  
             display_data['P'] = P
             display_data['f'] = f
             display_data['var1'] = var1
@@ -391,6 +407,7 @@ def ganova_page():
         display_data = {}
         display_data['var1'] = ""
         display_data['group'] = ""
+        mean = ""
 
         if request.method == 'POST':
             render_plot = True
@@ -410,15 +427,32 @@ def ganova_page():
                 curr.append(item[str(var1)])
                 group_scores[ str(item[str(group)]) ] = curr
             comp_arr = []
+            labels = []
             for grp in data_frame[str(group)].unique():
                 print(grp)
                 group_scores[str(grp)]
                 print(group_scores[str(grp)])
+                labels.append(grp)
                 comp_arr.append(np.asarray(group_scores[str(grp)]))
-            print(comp_arr)
             f, P = scipy_stats.f_oneway(*comp_arr)
-            print(f)
-            print(P)
+
+            lbl_arry = []
+            label_outliers = []
+            index = 0
+            for grp in data_frame[str(group)].unique():                   
+                ncdata = np.array( group_scores[str(grp)] )
+                upper = np.percentile(ncdata,75)
+                lower = np.percentile(ncdata,25)
+                for item in ncdata:
+                    if item > upper or item < lower:
+                        label_outliers.append([int(index), item])                    
+                lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
+                index = index + 1
+
+            display_data['outliers'] = label_outliers
+            display_data['boxplots'] = lbl_arry
+            display_data['labels'] = labels
+            display_data['mean'] = var1_arr.mean()            
             display_data['P'] = P
             display_data['f'] = f
             display_data['var1'] = var1

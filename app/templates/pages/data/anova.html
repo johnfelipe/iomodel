@@ -86,6 +86,7 @@
                   </tr>
                   </tbody>
                 </table>
+                <div id="container" style="height: 500px; margin: auto; min-width: 310px; max-width: 1000px"></div>
           </div>
           <div class="card-footer "></div>
         </div>               
@@ -96,7 +97,70 @@
 
 <script>
 {% if render_plot == True %}
+Highcharts.chart('container', {
 
+    chart: {
+        type: 'boxplot'
+    },
+    credits: {
+        enabled: false
+    },
+
+    title: {
+        text: 'ANOVA by Group'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    xAxis: {
+        categories: {{display_data['labels'] | safe}},
+        title: {
+            text: 'Experiment No.'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'Observations'
+        },
+        plotLines: [{
+            value: {{display_data['mean']}},
+            color: 'red',
+            width: 1,
+            label: {
+                text: 'Mean: {{display_data["mean"]}}',
+                align: 'center',
+                style: {
+                    color: 'gray'
+                }
+            }
+        }]
+    },
+
+    series: [{
+        name: 'Observations',
+        data: {{display_data['boxplots'] | safe}},
+        tooltip: {
+            headerFormat: '<em>Group {point.key}</em><br/>'
+        }
+    }, {
+        name: 'Outlier',
+        color: Highcharts.getOptions().colors[0],
+        type: 'scatter',
+        data: {{display_data['outliers'] | safe}},
+        marker: {
+            fillColor: 'white',
+            lineWidth: 1,
+            lineColor: Highcharts.getOptions().colors[0]
+        },
+        tooltip: {
+            pointFormat: 'Observation: {point.y}'
+        }
+    }]
+
+});
 {% endif %}
 </script>
 {% endblock %}
