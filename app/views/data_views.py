@@ -361,7 +361,7 @@ def anova_page():
             display_data['outliers'] = label_outliers
             display_data['boxplots'] = lbl_arry
             display_data['labels'] = grps
-            display_data['mean'] = var1_arr.mean()                  
+            display_data['mean'] = (var1_arr + comp_arr).mean()                  
             display_data['P'] = P
             display_data['f'] = f
             display_data['var1'] = var1
@@ -420,18 +420,16 @@ def ganova_page():
             group_scores = {}
             for grp in data_frame[str(group)].unique():
                 group_scores[str(grp)] = []
-                print(grp)
-            print(group_scores)
+
             for item in data_frame:
                 curr = group_scores[ str(item[str(group)]) ]
                 curr.append(item[str(var1)])
                 group_scores[ str(item[str(group)]) ] = curr
             comp_arr = []
             labels = []
+
             for grp in data_frame[str(group)].unique():
-                print(grp)
                 group_scores[str(grp)]
-                print(group_scores[str(grp)])
                 labels.append(grp)
                 comp_arr.append(np.asarray(group_scores[str(grp)]))
             f, P = scipy_stats.f_oneway(*comp_arr)
@@ -1055,6 +1053,7 @@ def data_import_page():
                 if not os.path.isdir(pname):
                     os.mkdir(pname)
                 fname = os.path.join(pname, filename)
+                print(fname)
                 file.save(fname)
                 sframe = tc.SFrame(data=fname)
                 if sframe.num_rows() < 5:
