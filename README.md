@@ -44,6 +44,7 @@ We assume that you have `git` and `virtualenv` and `virtualenvwrapper` installed
     cd ~/dev
     git clone https://github.com/twintechlabs/iomodel.git iomodel
 
+    sudo apt-get install libpq-dev   # Needed for Ubuntu 19.04 / Python 3.7
     pip install -r requirements.txt
 
 

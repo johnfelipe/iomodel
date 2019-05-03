@@ -22,7 +22,7 @@ pytest-cov==2.4.0
 # tox==2.7.0
 
 # Science
-numpy==1.14.0
+numpy
 turicreate
 scipy
 scikit-learn
