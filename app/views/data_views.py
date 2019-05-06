@@ -322,9 +322,18 @@ def do_anova(groups, group_scores, overall):
     f, P = scipy_stats.f_oneway(*data_arr)
     lbl_arry = []
     label_outliers = []
+    stats = []
     index = 0
+
+    # Descriptive statistics
+    ndata = overall.to_numpy()
+    cdata = overall
+    stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": "Overall"})
+
     for grp in groups:                   
         ncdata = np.array( group_scores[str(grp)] )
+        cdata = np.array( group_scores[str(grp)] )
+        stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": grp})
         upper = np.percentile(ncdata,75)
         lower = np.percentile(ncdata,25)
         for item in ncdata:
@@ -337,6 +346,7 @@ def do_anova(groups, group_scores, overall):
     display_data['boxplots'] = lbl_arry
     display_data['labels'] = labels
     display_data['mean'] = overall.mean()            
+    display_data['stats'] = stats 
     display_data['P'] = P
     display_data['f'] = f
 

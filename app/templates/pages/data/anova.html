@@ -66,26 +66,56 @@
             <strong>Results</strong>
           </div>
           <div class="card-body ">
-                <table class="table table-hover table-striped table-bordered">
-                  <thead>
-                    <tr>
-                      <th class="d-none d-lg-table-cell"></th>
-                      <th class="d-none d-lg-table-cell"></th>
-                      <th class="d-none d-lg-table-cell"></th>
-                      <th class="d-none d-lg-table-cell">f statistic</th>
-                      <th class="d-none d-lg-table-cell">P Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+            <h3>Data Summary</h3>
+             <table class="table table-hover table-striped table-bordered">
+                <thead>
                   <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="d-none d-lg-table-cell">{{display_data["f"]}}</td>
-                    <td class="d-none d-lg-table-cell">{{display_data["P"]}}</td>
+                    <th>Group</th>
+                    <th class="d-none d-lg-table-cell">Min</th>
+                    <th class="d-none d-lg-table-cell">Max</th>
+                    <th class="d-none d-lg-table-cell">Mean</th>
+                    <th class="d-none d-lg-table-cell">Median</th>
+                    <th class="d-none d-lg-table-cell">Mode</th>
+                    <th class="d-none d-lg-table-cell">Std. Dev.</th>
+                    <th class="d-none d-lg-table-cell">Variance</th>
                   </tr>
-                  </tbody>
-                </table>
+                </thead>
+                <tbody>
+                {% for item in display_data["stats"] %}
+                <tr>
+                  <td>{{item["name"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["min"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["max"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["mean"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["median"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["mode"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["std"]}}</td>
+                  <td class="d-none d-lg-table-cell">{{item["var"]}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+              </table>  
+            <h3>ANOVA Results</h3>            
+            <table class="table table-hover table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th class="d-none d-lg-table-cell"></th>
+                  <th class="d-none d-lg-table-cell"></th>
+                  <th class="d-none d-lg-table-cell"></th>
+                  <th class="d-none d-lg-table-cell">f statistic</th>
+                  <th class="d-none d-lg-table-cell">P Value</th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="d-none d-lg-table-cell">{{display_data["f"]}}</td>
+                <td class="d-none d-lg-table-cell">{{display_data["P"]}}</td>
+              </tr>
+              </tbody>
+            </table>
                 <div id="container" style="height: 500px; margin: auto; min-width: 310px; max-width: 1000px"></div>
           </div>
           <div class="card-footer "></div>
