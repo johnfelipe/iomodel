@@ -327,13 +327,14 @@ def do_anova(groups, group_scores, overall):
 
     # Descriptive statistics
     ndata = overall.to_numpy()
+    N = ndata.size
     cdata = overall
-    stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": "Overall"})
+    stats.append({"count": N, "min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": "Overall"})
 
     for grp in groups:                   
         ncdata = np.array( group_scores[str(grp)] )
         cdata = np.array( group_scores[str(grp)] )
-        stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": grp})
+        stats.append({"sum": np.sum(cdata), "count": cdata.size, "min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": grp})
         upper = np.percentile(ncdata,75)
         lower = np.percentile(ncdata,25)
         for item in ncdata:
@@ -341,6 +342,10 @@ def do_anova(groups, group_scores, overall):
                 label_outliers.append([int(index), item])                    
         lbl_arry.append([round(np.nanmin(ncdata), 2), lower, round(np.nanmean(ncdata), 2), upper, round(np.nanmax(ncdata), 2)])
         index = index + 1
+
+    k = len(groups)
+    display_data['df_within'] = k-1
+    display_data['df_between'] = N-k
 
     display_data['outliers'] = label_outliers
     display_data['boxplots'] = lbl_arry
