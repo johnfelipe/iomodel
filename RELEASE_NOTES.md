@@ -9,3 +9,4 @@ RELEASE NOTES
 5. Added ANOVA
 6. Fixed bug in prediction API that was rounding results to a whole number
 7. Minor UI bug fixes
+8. Added row sum (multiple columns) and row difference (2 columns) to the available transforms

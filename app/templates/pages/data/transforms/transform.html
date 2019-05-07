@@ -28,21 +28,13 @@
             </thead>
             <tbody>
               <tr>
-                <td><a href={{ url_for('transforms.recode_step1_page', data_id=my_data.id) }}>Code Field</a></td>
-                <td>Re-code a text field to numeric for use as a target in a classification model.</td>
-              </tr>
+                <td><a href={{ url_for('transforms.unique_page', data_id=my_data.id) }}>Add Unique Identifier</a></td>
+                <td>Add a unique identifier to each row of your data set.</td>
+              </tr>   
               <tr>
-                <td><a href={{ url_for('transforms.sample_page', data_id=my_data.id) }}>Sample</a></td>
-                <td>Create a derived data set that is a subset of this one.</td>
-              </tr>
-              <tr>
-                <td><a href={{ url_for('transforms.split_page', data_id=my_data.id) }}>Training/Test Split</a></td>
-                <td>Randomly sample the original data and create two new fractional data sets.</td>
-              </tr>
-              <tr>
-                <td><a href={{ url_for('transforms.split_session_page', data_id=my_data.id) }}>Training/Test Split (session based)</a></td>
-                <td>For longitudinal data (or time series sensors),randomly sample the original data and create two new fractional data sets.</td>
-              </tr>
+                <td><a href={{ url_for('transforms.classify_page', data_id=my_data.id) }}>Bounded Classifier</a></td>
+                <td>Classifiy data based on numeric ranges.</td>
+              </tr>   
               <tr>
                 <td><a href={{ url_for('transforms.calculate_slope_page', data_id=my_data.id) }}>Calculate Slope</a></td>
                 <td>Calculate slope of change for longitudinal data to develop a model that can forecast future state.</td>
@@ -56,16 +48,12 @@
                 <td>Useful for cleaning data sets. Delete a hard-coded value from the data set.</td>
               </tr>
               <tr>
+                <td><a href={{ url_for('transforms.recode_step1_page', data_id=my_data.id) }}>Code Field</a></td>
+                <td>Re-code a text field to numeric for use as a target in a classification model.</td>
+              </tr>
+              <tr>
                 <td><a href={{ url_for('transforms.fill_na_page', data_id=my_data.id) }}>Fill N/A (NaN/None)</a></td>
                 <td>Replace N/A (NaN/None) values with a speciifc value.</td>
-              </tr>
-              <tr>
-                <td><a href={{ url_for('transforms.outlliers_page', data_id=my_data.id) }}>Univariate Outlier Removal (percent)</a></td>
-                <td>Remove a specificed percent of outliers for a feature.</td>
-              </tr>
-              <tr>
-                <td><a href={{ url_for('transforms.outlliers_threshold_page', data_id=my_data.id) }}>Univariate Outlier Removal (threshold)</a></td>
-                <td>Remove outliers over a specified threshold for a feature.</td>
               </tr>
               <tr>
                 <td><a href={{ url_for('transforms.remove_columns_page', data_id=my_data.id) }}>Remove Columns</a></td>
@@ -76,21 +64,41 @@
                 <td>Rename a column to something else.</td>
               </tr>    
               <tr>
-                <td><a href={{ url_for('transforms.unique_page', data_id=my_data.id) }}>Add Unique Identifier</a></td>
-                <td>Add a unique identifier to each row of your data set.</td>
-              </tr>   
-              <tr>
                 <td><a href={{ url_for('transforms.dedup_page', data_id=my_data.id) }}>Remove Duplicates</a></td>
                 <td>Remove duplicate rows from this data set.</td>
               </tr>   
               <tr>
+                <td><a href={{ url_for('transforms.rowdiff_page', data_id=my_data.id) }}>Row Diff</a></td>
+                <td>Calculate difference between selected columns by row.</td>
+              </tr>                  
+              <tr>
+                <td><a href={{ url_for('transforms.rowsum_page', data_id=my_data.id) }}>Row Sum</a></td>
+                <td>Sum selected columns by row.</td>
+              </tr>                 
+              <tr>
+                <td><a href={{ url_for('transforms.sample_page', data_id=my_data.id) }}>Sample</a></td>
+                <td>Create a derived data set that is a subset of this one.</td>
+              </tr>                
+              <tr>
                 <td><a href={{ url_for('transforms.smote_step1', data_id=my_data.id) }}>SMOTE</a></td>
                 <td>Synthetic Minority Oversampling Technique</td>
-              </tr>  
+              </tr>   
               <tr>
-                <td><a href={{ url_for('transforms.classify_page', data_id=my_data.id) }}>Bounded Classifier</a></td>
-                <td>Classifiy data based on numeric ranges.</td>
-              </tr>                                                                               
+                <td><a href={{ url_for('transforms.split_page', data_id=my_data.id) }}>Training/Test Split</a></td>
+                <td>Randomly sample the original data and create two new fractional data sets.</td>
+              </tr>    
+              <tr>
+                <td><a href={{ url_for('transforms.split_session_page', data_id=my_data.id) }}>Training/Test Split (session based)</a></td>
+                <td>For longitudinal data (or time series sensors),randomly sample the original data and create two new fractional data sets.</td>
+              </tr>      
+              <tr>
+                <td><a href={{ url_for('transforms.outlliers_page', data_id=my_data.id) }}>Univariate Outlier Removal (percent)</a></td>
+                <td>Remove a specificed percent of outliers for a feature.</td>
+              </tr>
+              <tr>
+                <td><a href={{ url_for('transforms.outlliers_threshold_page', data_id=my_data.id) }}>Univariate Outlier Removal (threshold)</a></td>
+                <td>Remove outliers over a specified threshold for a feature.</td>
+              </tr>                                                                          
             </tbody>
           </table>
         </div>

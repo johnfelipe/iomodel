@@ -580,6 +580,117 @@ def convert_magic_page():
         db.session.commit()
         return redirect(request.referrer)
 
+@transforms_blueprint.route('/rowsum', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def rowsum_page():
+    # try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+
+        if request.method == 'POST':
+            name = str(request.form['name'])
+            variable = str(request.form['variable'])
+            totals = []
+            for item in data_frame:
+                running = 0
+                for feature in request.form.getlist('features'):
+                    running = running + item[str(feature)]
+                totals.append(running)
+            # for feature in request.form.getlist('features'):
+            #     orig_data = data_frame[str(feature)]
+            #     norig_data = orig_data.to_numpy()
+            #     new_data = []
+            #     for item in norig_data:
+            #         if str(item) == magic:
+            #             new_data.append(None)
+            #         else:
+            #             new_data.append(item)
+            #     sa = SArray(new_data)
+            #     data_frame[str(feature)] = sa
+            # fwd_id = save_data(my_data, name, data_frame)
+            print(totals)
+            sa = tc.SArray(totals)
+            res = data_frame.add_column(sa, variable)      
+            fwd_id = save_data(my_data, name, res)      
+            flash('Successfully summed values!', 'success')
+            return redirect(url_for('data.data_details_page', data_id=fwd_id))
+
+        return render_template('pages/data/transforms/rowsum.html',
+            my_data=my_data,
+            data_frame=data_frame,
+            names=names,
+            types=types,
+            form=form)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
+@transforms_blueprint.route('/rowdiff', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def rowdiff_page():
+    # try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+
+        if request.method == 'POST':
+            name = str(request.form['name'])
+            variable = str(request.form['variable'])
+            feat1 = str(request.form['feature1'])
+            feat2 = str(request.form['feature2'])
+            totals = []
+            for item in data_frame:
+                totals.append(item[str(feat1)] - item[str(feat2)])
+                
+            # for feature in request.form.getlist('features'):
+            #     orig_data = data_frame[str(feature)]
+            #     norig_data = orig_data.to_numpy()
+            #     new_data = []
+            #     for item in norig_data:
+            #         if str(item) == magic:
+            #             new_data.append(None)
+            #         else:
+            #             new_data.append(item)
+            #     sa = SArray(new_data)
+            #     data_frame[str(feature)] = sa
+            # fwd_id = save_data(my_data, name, data_frame)
+            sa = tc.SArray(totals)
+            res = data_frame.add_column(sa, variable)      
+            fwd_id = save_data(my_data, name, res)      
+            flash('Successfully differenced values!', 'success')
+            return redirect(url_for('data.data_details_page', data_id=fwd_id))
+
+        return render_template('pages/data/transforms/rowdiff.html',
+            my_data=my_data,
+            data_frame=data_frame,
+            names=names,
+            types=types,
+            form=form)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
 @transforms_blueprint.route('/recode_step2', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def recode_step2_page():
