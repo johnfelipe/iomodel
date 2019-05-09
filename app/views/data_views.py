@@ -319,7 +319,6 @@ def do_anova(groups, group_scores, overall):
     for grp in groups:
         labels.append(grp)
         data_arr.append(np.asarray(group_scores[str(grp)]))        
-    f, P = scipy_stats.f_oneway(*data_arr)
     lbl_arry = []
     label_outliers = []
     stats = []
@@ -344,16 +343,40 @@ def do_anova(groups, group_scores, overall):
         index = index + 1
 
     k = len(groups)
+    grand_mean = overall.mean() 
+
+    ssa = 0
+    ssw = 0
+    # Calculate SSA
+    for grp in groups:
+        ncdata = np.array( group_scores[str(grp)] )
+        n = len(ncdata)
+        ssa = ssa + ( n * (cdata.mean() - grand_mean)**2 )
+
+    # Calculate SSW
+    for grp in groups:
+        ncdata = np.array( group_scores[str(grp)] )
+        mn = ncdata.mean()
+        for val in ncdata:
+            ssw = ssw + (val - mn)**2
+
     display_data['df_within'] = k-1
     display_data['df_between'] = N-k
 
     display_data['outliers'] = label_outliers
     display_data['boxplots'] = lbl_arry
     display_data['labels'] = labels
-    display_data['mean'] = overall.mean()            
+    display_data['mean'] = grand_mean         
     display_data['stats'] = stats 
-    display_data['P'] = P
-    display_data['f'] = f
+    display_data['ssa'] = round(ssa, 5)
+    display_data['ssw'] = round(ssw, 5)
+    display_data['msa'] = round(ssa / (k-1), 5)
+    display_data['msw'] = round(ssw / (N-k), 5)  
+
+    F = display_data['msa'] / display_data['msw']
+    p = scipy_stats.f.sf(F, display_data['df_between'], display_data['df_within'] )
+    display_data['P'] = p
+    display_data['f'] = F 
 
     return display_data
 

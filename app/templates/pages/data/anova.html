@@ -114,25 +114,25 @@
               <tbody>
                 <tr>
                   <td>Between Groups</td>
-                  <td></td>
+                  <td>{{display_data["ssa"]}}</td>
                   <td>{{display_data['df_within']}}</td>
-                  <td></td>
+                  <td>{{display_data["msa"]}}</td>
                   <td class="d-none d-lg-table-cell">{{display_data["f"]}}</td>
                   <td class="d-none d-lg-table-cell">{{display_data["P"]}}</td>
                 </tr>
                 <tr>
                   <td>Within Groups</td>
-                  <td></td>
+                  <td>{{display_data["ssw"]}}</td>
                   <td>{{display_data['df_between']}}</td>
-                  <td></td>
+                  <td>{{display_data["msw"]}}</td>
                   <td class="d-none d-lg-table-cell"></td>
                   <td class="d-none d-lg-table-cell"></td>
                 </tr>   
                 <tr>
                   <td><b>Total</b></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <td>{{display_data["ssw"] + display_data["ssa"]}}</td>
+                  <td>{{display_data["df_between"] + display_data["df_within"]}}</td>
+                  <td>{{display_data["msw"] + display_data["msa"]}}</td>
                   <td class="d-none d-lg-table-cell"></td>
                   <td class="d-none d-lg-table-cell"></td>
                 </tr>                             
