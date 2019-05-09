@@ -15,6 +15,9 @@ from scipy.stats import linregress
 import math
 import random
 import psycopg2
+import pandas as pd 
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
 
 from app import db
 from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, ErrorLog, StorageSlice, ClusterAnalysis, DBConn, Project
@@ -330,6 +333,19 @@ def do_anova(groups, group_scores, overall):
     cdata = overall
     stats.append({"count": N, "min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "name": "Overall"})
 
+    score = []
+    group = []
+    for grp in groups:
+        ncdata = np.array( group_scores[str(grp)] )
+        mn = ncdata.mean()
+        for val in ncdata:
+            score.append(val)
+            group.append(grp)
+    pdata = { 'score': score, 'group': group }
+    pframe = pd.DataFrame.from_dict(pdata)
+    results = ols('score ~ C(group)', data=pframe).fit()
+    aov_table = sm.stats.anova_lm(results, typ=2)
+
     for grp in groups:                   
         ncdata = np.array( group_scores[str(grp)] )
         cdata = np.array( group_scores[str(grp)] )
@@ -345,38 +361,19 @@ def do_anova(groups, group_scores, overall):
     k = len(groups)
     grand_mean = overall.mean() 
 
-    ssa = 0
-    ssw = 0
-    # Calculate SSA
-    for grp in groups:
-        ncdata = np.array( group_scores[str(grp)] )
-        n = len(ncdata)
-        ssa = ssa + ( n * (cdata.mean() - grand_mean)**2 )
-
-    # Calculate SSW
-    for grp in groups:
-        ncdata = np.array( group_scores[str(grp)] )
-        mn = ncdata.mean()
-        for val in ncdata:
-            ssw = ssw + (val - mn)**2
-
-    display_data['df_within'] = k-1
-    display_data['df_between'] = N-k
-
+    display_data['df_within'] = aov_table['df'][0]
+    display_data['df_between'] = aov_table['df'][1]
     display_data['outliers'] = label_outliers
     display_data['boxplots'] = lbl_arry
     display_data['labels'] = labels
     display_data['mean'] = grand_mean         
     display_data['stats'] = stats 
-    display_data['ssa'] = round(ssa, 5)
-    display_data['ssw'] = round(ssw, 5)
-    display_data['msa'] = round(ssa / (k-1), 5)
-    display_data['msw'] = round(ssw / (N-k), 5)  
-
-    F = display_data['msa'] / display_data['msw']
-    p = scipy_stats.f.sf(F, display_data['df_between'], display_data['df_within'] )
-    display_data['P'] = p
-    display_data['f'] = F 
+    display_data['ssa'] = round(aov_table['sum_sq'][0], 5)
+    display_data['ssw'] = round(aov_table['sum_sq'][1], 5)
+    display_data['msa'] = round(aov_table['sum_sq'][0] / (k-1), 5)
+    display_data['msw'] = round(aov_table['sum_sq'][1] / (N-k), 5)  
+    display_data['P'] = round(aov_table['PR(>F)'][0], 5)
+    display_data['f'] = round(aov_table['F'][0], 5)
 
     return display_data
 

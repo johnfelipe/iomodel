@@ -1,6 +1,6 @@
 RELEASE NOTES
 
---- v1.2.0 ---
+--- v1.3.0 ---
 
 1. Added support for batch API prediction processing.
 2. Updated TuriCreate to 5.4
