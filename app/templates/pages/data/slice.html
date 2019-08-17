@@ -88,13 +88,13 @@ Highcharts.chart('container_{{feature}}', {
     xAxis: {
         categories: {{labels | safe}},
         title: {
-            text: 'Experiment No.'
+            text: 'Label'
         }
     },
 
     yAxis: {
         title: {
-            text: 'Observations'
+            text: 'Score'
         },
         plotLines: [{
             value: {{means[feature]}},
