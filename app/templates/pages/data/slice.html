@@ -111,10 +111,10 @@ Highcharts.chart('container_{{feature}}', {
     },
 
     series: [{
-        name: 'Observations',
+        name: 'Score',
         data: {{boxplots[feature] | safe}},
         tooltip: {
-            headerFormat: '<em>Experiment No {point.key}</em><br/>'
+            headerFormat: '<em>Labels {point.key}</em><br/>'
         }
     }, {
         name: 'Outlier',
