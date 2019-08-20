@@ -516,6 +516,7 @@ def cross_validation_page():
 
         data_frame_cleaned = data_frame_cleaned.add_row_number(column_name='process_id')
         size = len(data_frame_cleaned)
+        print(size)
         f = open(os.devnull, 'w')
         oldout = sys.stdout
         sys.stdout = f

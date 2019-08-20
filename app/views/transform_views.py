@@ -922,6 +922,42 @@ def smote_page():
     #     db.session.commit()
     #     return redirect(request.referrer)
 
+@transforms_blueprint.route('/clear_na', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def clear_na_page():
+    # try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
+
+        if request.method == 'POST':
+
+            for feature in request.form.getlist('features'):
+                data_frame = data_frame.dropna(str(feature), how="all")
+            size = len(data_frame)
+
+            fwd_id = save_data(my_data, request.form['name'], data_frame)
+
+            flash('Data transform is sucessful!', 'success')
+            return redirect(url_for('data.data_details_page', data_id=fwd_id))
+        return render_template('pages/data/transforms/clear_na.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=data_frame.column_names(),
+            types=data_frame.column_types())
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
+
 @transforms_blueprint.route('/calculate_slope', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def calculate_slope_page():
