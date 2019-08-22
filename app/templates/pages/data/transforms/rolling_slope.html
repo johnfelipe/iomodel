@@ -6,7 +6,7 @@
   <li class="breadcrumb-item"><a href="{{ url_for('main.project_page') }}">Projects</a></li>
   <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.project.name}}</a></li>
   <li class="breadcrumb-item"><a href="{{ url_for('main.my_project_page', project_id=my_data.project.id) }}">{{my_data.name}}</a></li>
-  <li class="breadcrumb-item"><a href={{ url_for('transforms.transform_page', data_id=my_data.id) }}>Transforms</a></li>
+  <li class="breadcrumb-item"><a href="{{ url_for('transforms.transform_page', data_id=my_data.id) }}">Transforms</a></li>
   <li class="breadcrumb-item active">Calculate Slope (incremental)</li>
 </ol>
 
@@ -15,7 +15,7 @@
       <div class="card ">
         <form action="" id="form" method="POST" class="form" role="form">
           <div class="card-header ">
-            <strong>Randomly sample the original data and create two new fractional data sets</strong>
+            <strong>Calculate icremental slope over longitudinal data</strong>
           </div>
           <div class="card-body ">
               {{ form.hidden_tag() }}
