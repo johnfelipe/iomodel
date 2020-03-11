@@ -1,4 +1,4 @@
-# ioModel Research Platform - v1.3.0
+# ioModel Research Platform - v1.3.1
 
 ![Screenshot](https://github.com/twintechlabs/iomodel/blob/master/app/static/images/screenshot.png)
 
