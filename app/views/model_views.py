@@ -742,6 +742,7 @@ def model_details_page():
         for item in my_model.features["importance"]:
             feats.append(str(item["name"]))
             imps.append(float(item["count"]))
+
         return render_template('pages/models/model_details.html',
             my_model=my_model,
             my_data=my_data,

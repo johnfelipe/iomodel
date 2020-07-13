@@ -158,6 +158,12 @@ class TrainedModel(db.Model):
         backref=db.backref('models',
                          uselist=True,
                          cascade='delete,all'))
+    
+    def model_status(self):
+        if self.results['auc'] == None:
+            return "failed"
+        else:
+            return "valid"
 
 class ClusterAnalysis(db.Model):
     __tablename__ = 'cluster_analysis'

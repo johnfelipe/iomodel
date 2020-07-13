@@ -58,7 +58,7 @@
               <input class="form-control" type="number" id="max_iterations" min="10" max="1000" name="max_iterations" placeholder="Optional (default=10)" value=10>
             </div>         
             <div class="form-group">
-              <label for="target">Select a Target</label>
+              <label for="target">Select a Target <i><small>Note: Strings not supported as prediction target - use transform to convert to integter.</i></small></label>
               <select class="form-control" required="true" id="target" name="target">
                 <option value="">--- Select a Target ---</option>
                 {% for x in range(0, names.__len__()) %}

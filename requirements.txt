@@ -22,6 +22,7 @@ pytest-cov==2.4.0
 # tox==2.7.0
 
 # Science
+tensorflow
 numpy
 turicreate
 scipy

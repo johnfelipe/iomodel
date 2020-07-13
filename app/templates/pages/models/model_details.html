@@ -127,81 +127,88 @@
                         <strong>Model Performance</strong>
                     </div>
                     <div class="card-body">
-                        {% if my_model.features['model_class'] != "predictor" %}
-                            <div id="model_summary" style="height: 250px; margin: 0 auto"></div>
-                        {% endif %}
-                        <table class="table table-hover table-striped table-bordered">
-                            <thead>
-                                <tr>
-                                    {% if my_model.features['model_class'] == "predictor" %}
-                                        <th>Max Error</th>
-                                        <th>RMSE</th>
-                                    {% else %} 
-                                        {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
-                                            <th>F1 Score</th>
-                                            <th>AUC</th>
-                                            <th>Recall</th>
-                                            <th>Precision</th>
-                                            <th>Accuracy</th>
+                        
+                            {% if my_model.features['model_class'] != "predictor" and my_model.model_status() == "valid"%}
+                                <div id="model_summary" style="height: 250px; margin: 0 auto"></div>
+                            {% endif %}
+                            {% if my_model.model_status() == "failed" %}
+                            <p style="color: red"><strong>This model is not valid. See training loss and model metrics.</strong></p>
+                            {% endif %}                            
+                        
+                            <table class="table table-hover table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        {% if my_model.features['model_class'] == "predictor" %}
+                                            <th>Max Error</th>
+                                            <th>RMSE</th>
+                                        {% else %} 
+                                            {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
+                                                <th>F1 Score</th>
+                                                <th>AUC</th>
+                                                <th>Recall</th>
+                                                <th>Precision</th>
+                                                <th>Accuracy</th>
+                                            {% else %}
+                                                <th>F1 Score</th>
+                                                <th>Recall</th>
+                                                <th>Precision</th>
+                                                <th>Accuracy</th>
+                                            {% endif %} 
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {% if my_model.features['model_class'] == "predictor" %}
+                                        <td>{{my_model.results["max_error"] | round(4)}}</td>
+                                        <td>{{my_model.results["rmse"] | round(4)}}</td>
                                         {% else %}
-                                            <th>F1 Score</th>
-                                            <th>Recall</th>
-                                            <th>Precision</th>
-                                            <th>Accuracy</th>
-                                        {% endif %} 
-                                    {% endif %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    {% if my_model.features['model_class'] == "predictor" %}
-                                    <td>{{my_model.results["max_error"] | round(4)}}</td>
-                                    <td>{{my_model.results["rmse"] | round(4)}}</td>
-                                    {% else %}
-                                    <td>{{my_model.results["f1_score"] | round(4)}}</td>
-                                    {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %} {% if my_model.results["auc"] != None %}
-                                    <td>{{my_model.results["auc"] | round(4)}}</td>
-                                    {% else %}
-                                    <td>None</td>
-                                    {% endif %} {% endif %}
-                                    <td>{{my_model.results["recall"] | round(4)}}</td>
-                                    <td>{{ my_model.results["precision"] |round(4) if my_model.results["precision"] != None else 'N/A' }}</td>
-                                    <td>{{my_model.results["accuracy"] | round(4)}}</td>
-                                    {% endif %}
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <td>{{my_model.results["f1_score"] | round(4)}}</td>
+                                        {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %} {% if my_model.results["auc"] != None %}
+                                        <td>{{my_model.results["auc"] | round(4)}}</td>
+                                        {% else %}
+                                        <td>None</td>
+                                        {% endif %} {% endif %}
+                                        <td>{{my_model.results["recall"] | round(4)}}</td>
+                                        <td>{{ my_model.results["precision"] |round(4) if my_model.results["precision"] != None else 'N/A' }}</td>
+                                        <td>{{my_model.results["accuracy"] | round(4)}}</td>
+                                        {% endif %}
+                                    </tr>
+                                </tbody>
+                            </table>
                     </div>
                     <div class="card-footer "></div>
                 </div>
-                <div class="card ">
-                    <div class="card-header">
-                        <strong>Data Performance</strong>
-                    </div>
-                    <div class="card-body">
-                        <div class="card ">
-                            <div class="card-header">
-                                <strong></strong>
-                            </div>
-                            <div class="card-body">
-                                <div id="container_integ" style="max-width: 800px; height: 200px; margin: 0 auto"></div>
-                            </div>
-                            <div class="card-footer "></div>
+                {% if my_model.model_status() == "valid" %}
+                    <div class="card ">
+                        <div class="card-header">
+                            <strong>Data Performance</strong>
                         </div>
-                        {% if my_model.features['model_type'] != 'linear' and my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
-                        <div class="card ">
-                            <div class="card-header">
-                                <strong></strong>
+                        <div class="card-body">
+                            <div class="card ">
+                                <div class="card-header">
+                                    <strong></strong>
+                                </div>
+                                <div class="card-body">
+                                    <div id="container_integ" style="max-width: 800px; height: 200px; margin: 0 auto"></div>
+                                </div>
+                                <div class="card-footer "></div>
                             </div>
-                            <div class="card-body">
-                                <div id="container" style="height: 400px; margin: 0 auto"></div>
+                            {% if my_model.features['model_type'] != 'linear' and my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
+                            <div class="card ">
+                                <div class="card-header">
+                                    <strong></strong>
+                                </div>
+                                <div class="card-body">
+                                    <div id="container" style="height: 400px; margin: 0 auto"></div>
+                                </div>
+                                <div class="card-footer "></div>
                             </div>
-                            <div class="card-footer "></div>
+                            {% endif %}
                         </div>
-                        {% endif %}
+                        <div class="card-footer "></div>
                     </div>
-                    <div class="card-footer "></div>
-                </div>
+                {% endif %}
 
                 <div class="card ">
                     <div class="card-header">
@@ -388,7 +395,7 @@ $('.btn').on('click', function() {
           name: 'Probablity of Correctness',
           color: "#0081af",
         {% if my_model.features['model_type'] != 'svm' and my_model.features['model_type'] != 'deep' %}
-            data: [{{my_model.results["f1_score"] | round(4)}}, {{my_model.results["auc"] | round(4)}}, {{my_model.results["recall"] | round(4)}}, {{my_model.results["precision"] | round(4)}}, {{my_model.results["accuracy"] | round(4)}}]
+            data: [{{ my_model.results["f1_score"] | round(4) if my_model.results["f1_score"] is not none else 'None' }}, {{ my_model.results["auc"] | round(4) if my_model.results["auc"] is not none else 'None' }}, {{ my_model.results["recall"] | round(4) if my_model.results["recall"] is not none else 'None' }}, {{ my_model.results["precision"] | round(4) if my_model.results["precision"] is not none else 'None' }}, {{ my_model.results["accuracy"] | round(4) if my_model.results["accuracy"] is not none else 'None' }}]
         {% else %}
            data: [{{my_model.results["f1_score"] | round(4)}}, {{my_model.results["recall"] | round(4)}}, {{my_model.results["precision"] | round(4)}}, {{my_model.results["accuracy"] | round(4)}}]
         {% endif %}                                   
