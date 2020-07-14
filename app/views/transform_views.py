@@ -62,12 +62,16 @@ def save_data(my_data, name, new_frame):
         cdata = data_frame_cleaned[cols[x]]
 
         missing = round(float(cdata_all.countna())/float(len(cdata_all)), 2) * 100
+     
         if (str(types[x].__name__) == "str"):
             stats.append({"min": "-", "max": "-", "mean": "-", "median": "-", "mode": "-", "std": "-", "var": "-", "sum": "-", "missing": missing})
-        else:
+        else:                           
             ndata = cdata.to_numpy()
             ndata = np.array(ndata).astype(np.float)
-            stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "missing": missing})
+            try: 
+                stats.append({"min": round(cdata.min(), 2), "max": round(cdata.max(), 2), "mean": round(cdata.mean(), 2), "median": round(np.median(ndata), 4), "mode": round(scipy_stats.mode(ndata).mode[0], 4), "std": round(cdata.std(), 2), "var": round(cdata.var(), 2), "sum": cdata.sum(), "missing": missing})
+            except:
+                stats.append({"min": "-", "max": "-", "mean": "-", "median": "-", "mode": "-", "std": "-", "var": "-", "sum": "-", "missing": missing})
 
     data.stats = stats
     new_frame.save(data.sname)
@@ -122,11 +126,9 @@ def split_session_page():
         display_cols = []
         names=data_frame.column_names()
         types=data_frame.column_types()
-        print(names)
         for x in range(0, names.__len__()):
             if (str(types[x].__name__) == "int"):
                 cols.append(str(names[x]))
-        print(cols)
         if request.method == 'POST':
             training_set,test_set = tc.activity_classifier.util.random_split_by_session(data_frame, session_id=str(request.form['idField']), fraction=float(request.form['percent']))
             save_data(my_data, request.form['train'], training_set)
@@ -1003,8 +1005,7 @@ def calculate_slope_page():
                 row = data_frame[x]
                 if x == 0 or data_frame[x-1][idField] != row[idField]:
                     targetVal = row[target]
-                    print(targetVal)
-                #print(row)
+
                 for feature in request.form.getlist('features'):
                     featArrays[str(feature)].append(row[str(feature)])
                 featArrays[xVal].append(row[str(xVal)])
@@ -1018,11 +1019,11 @@ def calculate_slope_page():
                         if key != xVal:
                             yValArr = np.array(value).astype(np.float)
                             slope, intercept, r_value, p_value, std_err = linregress(xValArr, yValArr)
+
                             finalRow[key+"_slope"] = float(slope)
                             finalRow[key+"_intercept"] = float(intercept)
                             if np.isnan(float(slope)) or np.isnan(float(intercept)):
                                 print("Got me a nan")
-                    print(finalRow)
                     for key, value in finalRow.items():
                         final_frame_vals[str(key)].append(value)
                     final_frame_vals[str(target) + "_initial"].append(targetVal)
