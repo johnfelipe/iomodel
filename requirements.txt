@@ -12,6 +12,7 @@ Flask-SQLAlchemy==2.1
 Flask-BabelEx
 Flask-User
 Flask-WTF==0.14.3
+email_validator
 
 # Automated tests
 pytest==3.0.5
