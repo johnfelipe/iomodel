@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>ioModel</title>
+        <title>ioModel (Beta)</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -41,7 +41,7 @@
             </button>
             <a class="navbar-brand" href="{{ url_for('main.project_page') }}">
                 <img src="/static/images/TwinTech1white.png" class="d-none d-lg-inline mr-2 w-25">
-                <font style="color: #1387b1">io</font><font style="color: #FFF" class="d-none d-lg-inline">Model</font><div class="d-block d-lg-none"><font style="color: #000">Model</font></div>
+                <font style="color: #1387b1">io</font><font style="color: #FFF" class="d-none d-lg-inline">Model </font><font style="color: #FFF; font-size: 10px;" class="d-none d-lg-inline">&nbsp;(BETA)</font><div class="d-block d-lg-none"></div>
             </a>
             <a class="nav-link nav-link--rounded pull-right" style="margin-right: 10px;" href="{{ url_for('user.logout') }}">
               Sign out
@@ -93,25 +93,27 @@
                       </li>
                     </ul>
                   </li>
-                  <li class="nav-title">Admin</li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.user_admin_page') }}">
-                      <i class="nav-icon icon-people"></i> Users</a>
-                  </li>
-                  <li class="nav-item nav-dropdown">
-                    <a class="nav-link nav-dropdown-toggle" href="#">
-                      <i class="nav-icon icon-support"></i> Errors</a>
-                    <ul class="nav-dropdown-items">
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.error_trends_page') }}">
-                          <i class="nav-icon icon-chart"></i> Trends</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.error_log_page') }}">
-                          <i class="nav-icon icon-magnifier"></i> Logs</a>
-                      </li>
-                    </ul>
-                  </li>                  
+                  {% if current_user.has_role('admin'): %}
+                    <li class="nav-title">Admin</li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('main.user_admin_page') }}">
+                        <i class="nav-icon icon-people"></i> Users</a>
+                    </li>
+                    <li class="nav-item nav-dropdown">
+                      <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="nav-icon icon-support"></i> Errors</a>
+                      <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ url_for('main.error_trends_page') }}">
+                            <i class="nav-icon icon-chart"></i> Trends</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{{ url_for('main.error_log_page') }}">
+                            <i class="nav-icon icon-magnifier"></i> Logs</a>
+                        </li>
+                      </ul>
+                    </li>  
+                  {% endif %}                 
                 </ul>
               </nav>
             </div>

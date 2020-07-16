@@ -12,7 +12,7 @@ from scipy import stats as scipy_stats
 import psycopg2
 
 from app import db
-from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, User, ErrorLog, UsersRoles, Project
+from app.models.user_models import UserProfileForm, UserDataForm, UserData, TrainModelForm, TrainedModel, User, ErrorLog, UsersRoles, Project, Role
 import uuid, json, os
 import datetime
 
@@ -54,25 +54,70 @@ def user_admin_page():
     return render_template('pages/admin/users.html',
         users=users)
 
-@main_blueprint.route('/create_user', methods=['GET', 'POST'])
+# @main_blueprint.route('/create_user', methods=['GET', 'POST'])
+# @roles_accepted('admin')
+# def create_user_page():
+#     form = UserProfileForm(request.form, obj=current_user)
+
+#     if request.method == 'POST':
+#         user = User.query.filter(User.email == request.form['email']).first()
+#         if not user:
+#             user = User(email=request.form['email'],
+#                         first_name=request.form['first_name'],
+#                         last_name=request.form['last_name'],
+#                         password=current_app.user_manager.hash_password(request.form['password']),
+#                         active=True,
+#                         email_confirmed_at=datetime.datetime.utcnow())
+#             db.session.add(user)
+#             db.session.commit()
+#             flash('You successfully created your user!', 'success')
+#         return redirect(url_for('main.user_admin_page'))
+#     return render_template('pages/admin/create_user.html',
+#                            form=form)
+
+
+@main_blueprint.route('/user', methods=['GET', 'POST'])
 @roles_accepted('admin')
 def create_user_page():
-    form = UserProfileForm(request.form, obj=current_user)
+    user_id = request.args.get('user_id')
+    # Initialize form
+    user = User()
+    if user_id is not None:
+        user = User.query.filter_by(id=user_id).first()
+    form = UserProfileForm(request.form, obj=user)
 
     if request.method == 'POST':
-        user = User.query.filter(User.email == request.form['email']).first()
-        if not user:
+        form.populate_obj(user)
+        role = Role.query.filter(Role.name == "admin").first()
+        if user.id is None:
             user = User(email=request.form['email'],
                         first_name=request.form['first_name'],
                         last_name=request.form['last_name'],
                         password=current_app.user_manager.hash_password(request.form['password']),
                         active=True,
                         email_confirmed_at=datetime.datetime.utcnow())
+            if str(request.form['role']) == "admin":   
+                user.roles.append(role)
+            else:
+                user.roles = []         
             db.session.add(user)
             db.session.commit()
+        else:
+            user.email = request.form['email']
+            user.first_name = request.form['first_name']
+            user.last_name = request.form['last_name']
+            if request.form['password'] is not None and request.form['password'] is not "":
+                user.password = current_app.user_manager.hash_password(request.form['password'])
+            if str(request.form['role']) == "admin":   
+                user.roles.append(role)
+            else:
+                user.roles = []                  
+            db.session.commit()
+        flash('You successfully updated your user!', 'success')
         return redirect(url_for('main.user_admin_page'))
     return render_template('pages/admin/create_user.html',
-                           form=form)
+                            user=user,
+                            form=form)
 
 @main_blueprint.route('/delete_user', methods=['GET'])
 @roles_accepted('admin')
