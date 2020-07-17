@@ -21,7 +21,7 @@
             {{ form.hidden_tag() }}
             <input type="hidden" name="data_id" value="{{my_data.id}}">
             <div class="form-group">
-              <label for="target">Select a Target</label>
+              <label for="target">Select a x-value</label>
               <select class="form-control" id="target" name="target">
                 {% for x in range(0, names.__len__()) %}
                   {% if types[x].__name__ != "str" %}
@@ -34,22 +34,34 @@
                 {% endfor %}
               </select>
             </div>
+            <div class="form-group">
+              <label for="target">Select a y-value</label>
+              <select class="form-control" id="yval" name="yval">
+                {% for x in range(0, names.__len__()) %}
+                  {% if types[x].__name__ != "str" %}
+                    {% if names[x] == yval %}
+                    <option value="{{names[x]}}" selected>{{names[x]}} ({{types[x].__name__}})</option>
+                    {% else %}
+                    <option value="{{names[x]}}">{{names[x]}} ({{types[x].__name__}})</option>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>            
             <button id="loading" style="margin-left: 20px; display:none;" class="btn btn-secondary btn-sm pull-right" disabled><i class='fa fa-circle-o-notch fa-spin'></i> Analyzing Data...</button><button type="submit" class="btn btn-primary pull-right toggle" id="submit" onclick="if ($('#form')[0].checkValidity() == true) { $('#submit').toggle();$('#loading').toggle(); }">Analyze</button>
           </form>
           {% if render_plot == True %}
           <br><br><br>
           <div class="row">
-          {% for x in range(0, display_cols.__len__()) %}            
-            <div class="col-lg-6">      
+            <div class="col-lg-12">      
                 <div class="card">    
                     <div class="card-header "></div>
                     <div class="card-body ">
-                      <div id="container{{x}}" style="height: 400px; max-width: 800px; margin: 0 auto"></div>
+                      <div id="container" style="height: 400px; max-width: 800px; margin: 0 auto"></div>
                     </div>
                     <div class="card-footer "></div>
                 </div>
             </div>
-          {% endfor %}
           </div>
           {% else %}
           {% endif %}
@@ -62,8 +74,7 @@
 <script>
 {% if render_plot == True %}
 
-{% for x in range(0, display_cols.__len__()) %}
-Highcharts.chart('container{{x}}', {
+Highcharts.chart('container', {
     chart: {
         type: 'scatter',
         zoomType: 'xy'
@@ -72,7 +83,7 @@ Highcharts.chart('container{{x}}', {
         enabled: false
     },
     title: {
-        text: '{{display_cols[x]}} vs. {{target}}'
+        text: '{{yval}} vs. {{target}}'
     },
     xAxis: {
         title: {
@@ -85,7 +96,7 @@ Highcharts.chart('container{{x}}', {
     },
     yAxis: {
         title: {
-            text: '{{display_cols[x]}}'
+            text: '{{yval}}'
         }
     },
     legend: {
@@ -125,11 +136,10 @@ Highcharts.chart('container{{x}}', {
     series: [{
         name: 'Observations',
         color: 'rgba(119, 152, 191, .5)',
-        data: {{plot_data[x] | safe}}
+        data: {{plot_data | safe}}
 
     }]
 });
-{% endfor %}
 {% endif %}
 </script>
 {% endblock %}

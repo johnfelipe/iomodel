@@ -253,66 +253,58 @@ def analyze_page():
 @login_required  # Limits access to authenticated users
 def scatter_analysis_page():
     data_id = request.args.get('data_id')
-    try:
-        my_data = UserData.query.filter_by(id=data_id).first()
-        if my_data.user_id is not current_user.id:
-            flash('Opps!  Do data found', 'error')
-            return redirect(request.referrer)
-        my_model = TrainedModel()
-        form = TrainModelForm(request.form, obj=my_model)
-        data_frame = tc.load_sframe(my_data.sname)
-        render_plot = False
-        target = None
-        cols = []
-        display_cols = []
-        plot_data = []
-        total_attrs = 0
-        names=data_frame.column_names()
-        types=data_frame.column_types()
-
-        if request.method == 'POST':
-            render_plot = True
-            target = request.form['target']
-            data_frame = tc.load_sframe(my_data.sname)
-            data_frame = data_frame.dropna(str(target), how="any")
-            for x in range(0, names.__len__()):
-                if (str(names[x]) != target) and (str(types[x].__name__) != "str"):
-                    cols.append(str(names[x]))
-                    data_frame = data_frame.dropna(str(names[x]), how="any")
-            target_data = data_frame[str(target)]
-            ntarget_data = target_data.to_numpy()
-
-            for x in range(0, names.__len__()):
-                if (names[x] != target) and (types[x].__name__ != "str"):
-                    scatter = []
-                    df = data_frame[names[x]]
-                    for y in range(0, ntarget_data.__len__()):
-                        scatter.append([ntarget_data[y], df[y]])
-                    total_attrs = total_attrs + 1
-                    display_cols.append(str(names[x]))
-                    plot_data.append(scatter)
-
-            print(total_attrs)
-        return render_template('pages/data/scatter_analysis.html',
-            my_data=my_data,
-            form=form,
-            data_frame=data_frame,
-            names=names,
-            types=types,
-            render_plot=render_plot,
-            target=target,
-            cols=cols,
-            display_cols=display_cols,
-            plot_data=plot_data)
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
+    # try:
+    my_data = UserData.query.filter_by(id=data_id).first()
+    if my_data.user_id is not current_user.id:
+        flash('Opps!  Do data found', 'error')
         return redirect(request.referrer)
+    my_model = TrainedModel()
+    form = TrainModelForm(request.form, obj=my_model)
+    data_frame = tc.load_sframe(my_data.sname)
+    render_plot = False
+    target = None
+    yval = None
+    cols = []
+    scatter = []
+    total_attrs = 0
+    names=data_frame.column_names()
+    types=data_frame.column_types()
+
+    if request.method == 'POST':
+        render_plot = True
+        target = request.form['target']
+        yval = request.form['yval']
+        data_frame = tc.load_sframe(my_data.sname)
+        data_frame = data_frame.dropna(str(target), how="any")
+        data_frame = data_frame.dropna(str(yval), how="any")
+
+        target_data = data_frame[str(target)]
+        ntarget_data = target_data.to_numpy()
+        
+        df = data_frame[str(yval)]
+        for y in range(0, ntarget_data.__len__()):
+            scatter.append([ntarget_data[y], df[y]])
+
+    return render_template('pages/data/scatter_analysis.html',
+        my_data=my_data,
+        form=form,
+        data_frame=data_frame,
+        names=names,
+        types=types,
+        render_plot=render_plot,
+        target=target,
+        yval=yval,
+        cols=cols,
+        plot_data=scatter)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 def do_anova(groups, group_scores, overall):
     data_arr = []
