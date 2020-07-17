@@ -32,8 +32,33 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
+def sanitize_results(original, predictions):
+    new_orig = []
+    new_pred = []    
+
+    for x in range(0, len(predictions)):
+        if original[x] is not None and predictions[x] is not None:
+            new_orig.append(original[x])
+            new_pred.append(predictions[x])
+
+    return {"orig": new_orig, "pred": new_pred}
+
+def sanitize_with_variance(original, predictions, variance):
+    new_orig = []
+    new_pred = []  
+    new_var = []    
+
+    for x in range(0, len(predictions)):
+        if original[x] is not None and predictions[x] is not None and variance[x] is not None:
+            new_orig.append(original[x])
+            new_pred.append(predictions[x])
+            new_var.append(variance[x])
+
+    return {"orig": new_orig, "pred": new_pred, "variance": variance}    
+
 def compute_explained_variance(norig_data, npredicted_data):
-    explained = metrics.explained_variance_score(norig_data, npredicted_data)
+    values = sanitize_results(norig_data, npredicted_data)
+    explained = metrics.explained_variance_score(values["orig"], values["pred"])
     unexplained = 1 - explained
     return explained, unexplained
 
@@ -319,8 +344,8 @@ def prediction_page():
         npredicted_data = np.array(apredictions)
 
         for x in range(0, len(my_dict.originals)):
-            if my_dict.originals[x] is None:
-                orig_data.append(npredicted_data[x])
+            if my_dict.originals[x] is None or my_dict.originals[x] == "None":
+                orig_data.append(None)
             else:
                 orig_data.append(float(my_dict.originals[x]))
         norig_data = np.array(orig_data)
@@ -331,16 +356,19 @@ def prediction_page():
         scatter = []
         sorted_variance = []
         truth_table = {}
-        npredicted_data = npredicted_data[np.logical_not(np.isnan(npredicted_data))]
+        san_vals = sanitize_results(norig_data, npredicted_data)
+        norig_data = san_vals["orig"]
+        npredicted_data = san_vals["pred"]
 
         if my_model.features['model_class'] == "predictor":
             for x in range(0, len(npredicted_data)):
-                if norig_data[x] is None or npredicted_data[x] is None:
+                if norig_data[x] is None:
                     variance.append(np.float64(0.0))
                 else:
                     variance.append(np.absolute(norig_data[x]-npredicted_data[x]))
                     scatter.append([norig_data[x],npredicted_data[x]])
             nvariance = np.array(variance)
+
             mean, sigma = np.mean(npredicted_data), np.std(npredicted_data)
             std_err = sigma / (sqrt(len(npredicted_data)))
             to_render['confidence_99'] = std_err * 2.575
@@ -355,6 +383,7 @@ def prediction_page():
                 if item > upper or item < lower:
                     outlier.append([0, item])
             explained, unexplained = compute_explained_variance(norig_data, npredicted_data)
+
             to_render['explained_variance'] = explained
             to_render['unexplained'] = unexplained
             to_render['outliers'] = outlier
@@ -393,6 +422,7 @@ def prediction_page():
                 results["accuracy"] = metrics.accuracy_score(norig_data, npredicted_data)
             except Exception as e:
                 results["accuracy"] = None
+
         return render_template('pages/models/prediction.html',
             my_data=my_data,
             my_dict=my_dict,
@@ -402,8 +432,8 @@ def prediction_page():
             results=results,
             filename=os.path.basename(my_dict.oname),
             truth_table=truth_table,
-            npredicted_data=npredicted_data.tolist(),
-            norig_data=norig_data.tolist(),
+            npredicted_data=npredicted_data,
+            norig_data=norig_data,
             variance=variance,
             sorted_variance=sorted_variance,
             examples=examples)
