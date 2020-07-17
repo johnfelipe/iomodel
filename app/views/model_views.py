@@ -464,6 +464,8 @@ def predictions_step1_page():
             data_id = request.form['data_set_id']
             my_data = UserData.query.filter_by(id=data_id).first()
             data_frame = tc.load_sframe(my_data.sname)
+            for feature in my_model.features['features']:
+                data_frame = data_frame.dropna(str(feature), how="any")            
             if my_model.features['model_type'] == 'deep':
                 tfrm = data_frame.to_dataframe()
                 tfrm = tfrm.sort_values(by=[my_model.features["session_id"], my_model.features["time_field"]])
