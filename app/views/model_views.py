@@ -332,7 +332,7 @@ def prediction_page():
         my_model = TrainedModel.query.filter_by(id=my_dict.model_id).first()
         my_data = UserData.query.filter_by(id=my_model.data_id).first()
         if my_data.user_id is not current_user.id:
-            flash('Opps!  Do data found', 'error')
+            flash('Opps!  No data found', 'error')
             return redirect(request.referrer)
 
         examples = len(my_dict.predictions)
@@ -456,7 +456,7 @@ def predictions_step1_page():
         my_model = TrainedModel.query.filter_by(id=model_id).first()
         my_data = UserData.query.filter_by(project_id=my_model.project_id).all()
         if my_data[0].user_id is not current_user.id:
-            flash('Opps!  Do data found', 'error')
+            flash('Opps!  No data found', 'error')
             return redirect(request.referrer)
 
         form = UserProfileForm(request.form, obj=current_user)
@@ -464,6 +464,13 @@ def predictions_step1_page():
             data_id = request.form['data_set_id']
             my_data = UserData.query.filter_by(id=data_id).first()
             data_frame = tc.load_sframe(my_data.sname)
+
+            # Validate that the data is there
+            test_data = data_frame[str(my_model.features['target'])]
+            if test_data.dtype.__name__ == "str":
+                flash('This data file does not look right. You are trying to predict a string value.', 'error')
+                return redirect(request.referrer)
+                
             for feature in my_model.features['features']:
                 data_frame = data_frame.dropna(str(feature), how="any")            
             if my_model.features['model_type'] == 'deep':
