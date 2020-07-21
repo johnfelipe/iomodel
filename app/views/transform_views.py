@@ -316,6 +316,106 @@ def recode_step1_page():
         db.session.commit()
         return redirect(request.referrer)
 
+@transforms_blueprint.route('/label_step1', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def label_step1():
+    try:
+        data_id = request.args.get('data_id')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
+        target = None
+        cols = []
+        display_cols = []
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+
+        for x in range(0, names.__len__()):
+            if (str(types[x].__name__) == "int"):
+                cols.append(str(names[x]))
+
+        if request.method == 'POST':
+            target = request.form['target']
+            return redirect(url_for('transforms.label_step2', data_id=my_data.id, target=target, name=request.form['name']))
+
+        return render_template('pages/data/transforms/create_label_field.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=names,
+            types=types,
+            target=target,
+            cols=cols)
+    except Exception as e:
+        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+        error = ErrorLog()
+        error.user_id = current_user.id
+        error.error = str(e.__class__)
+        error.parameters = request.args
+        db.session.add(error)
+        db.session.commit()
+        return redirect(request.referrer)
+
+@transforms_blueprint.route('/label_step2', methods=['GET', 'POST'])
+@login_required  # Limits access to authenticated users
+def label_step2():
+    try:
+        data_id = request.args.get('data_id')
+        target = request.args.get('target')
+        name = request.args.get('name')
+        my_data = UserData.query.filter_by(id=data_id).first()
+        my_model = TrainedModel()
+        form = TrainModelForm(request.form, obj=my_model)
+        data_frame = tc.load_sframe(my_data.sname)
+        names=data_frame.column_names()
+        types=data_frame.column_types()
+
+        orig_data = data_frame[str(target)]
+        norig_data = orig_data.to_numpy()
+
+        target_data = data_frame[str(target)].unique()
+        ntarget_data = target_data.to_numpy()
+
+        if request.method == 'POST':
+            mapped_values = []
+            data_frame = safely_add_col(str(target) + '_numerical_cateogry', data_frame[str(target)], data_frame)
+            for x in range(0, ntarget_data.__len__()):
+                mapped_values.append(str(request.form['new_value' + str(x)]))
+            cross_ref = []
+            for x in range(0, names.__len__()):
+                if (str(types[x].__name__) == "str"):
+                    cross_ref.append(str(names[x]))
+            new_data = []
+            for field in norig_data:
+                for y in range(0, ntarget_data.__len__()):
+                    if str(ntarget_data[y]) == str(field):
+                        new_data.append(mapped_values[y])
+            sa = SArray(new_data)
+            data_frame[str(target)] = sa
+            fwd_id = save_data(my_data, name, data_frame)
+
+            flash('Successfully created labels for ' + target + '!', 'success')
+            return redirect(url_for('data.data_details_page', data_id=fwd_id))
+        return render_template('pages/data/transforms/create_label_step_2.html',
+            my_data=my_data,
+            form=form,
+            data_frame=data_frame,
+            names=names,
+            name=name,
+            types=types,
+            ntarget_data=ntarget_data,
+            target=target)
+    except Exception as e:
+        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+        error = ErrorLog()
+        error.user_id = current_user.id
+        error.error = str(e.__class__)
+        error.parameters = request.args
+        db.session.add(error)
+        db.session.commit()
+        return redirect(request.referrer)
+
 @transforms_blueprint.route('/fill_na', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
 def fill_na_page():

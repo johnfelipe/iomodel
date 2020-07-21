@@ -548,7 +548,6 @@ def cross_validation_page():
 
         data_frame_cleaned = data_frame_cleaned.add_row_number(column_name='process_id')
         size = len(data_frame_cleaned)
-        print(size)
         f = open(os.devnull, 'w')
         oldout = sys.stdout
         sys.stdout = f
@@ -624,6 +623,7 @@ def cross_validation_page():
         scatter = []
         results = {}
         truth_table = {}
+
         if my_model.features['model_class'] == "predictor":
             for x in range(0, len(npredicted_data)):
                 variance.append(np.absolute(float(norig_data[x])-float(npredicted_data[x])))
@@ -655,7 +655,11 @@ def cross_validation_page():
             total_correct = 0
             total_missed = 0
             my_len = len(norig_data)
+            expected_values = []
             for x in range(0, my_len):
+                if not norig_data[x] in expected_values:
+                    expected_values.append(norig_data[x])                
+              
                 if (str(norig_data[x]), str(npredicted_data[x])) not in truth_table:
                     truth_table[(str(norig_data[x]), str(npredicted_data[x]))] = 1
                 else:
@@ -664,6 +668,11 @@ def cross_validation_page():
                     total_correct = total_correct + 1
                 else:
                     total_missed = total_missed + 1
+
+            for item in expected_values:
+                if (str(item), str(item)) not in truth_table:
+                    truth_table[(str(item), str(item))] = 0      
+
             try:
                 to_render['accuracy'] = {"total_missed": total_missed, "total_correct": total_correct}
             except Exception as e:

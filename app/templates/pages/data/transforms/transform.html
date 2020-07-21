@@ -52,6 +52,10 @@
                 <td>Re-code a text field to numeric for use as a target in a classification model.</td>
               </tr>
               <tr>
+                <td><a href={{ url_for('transforms.label_step1', data_id=my_data.id) }}>Create Label Column</a></td>
+                <td>Create a new string label for an integer categorical variable.</td>
+              </tr>               
+              <tr>
                 <td><a href={{ url_for('transforms.clear_na_page', data_id=my_data.id) }}>Drop N/A</a></td>
                 <td>Useful for cleaning data sets. Drop N/A values from the data set.</td>
               </tr>                 
