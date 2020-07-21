@@ -326,7 +326,7 @@ def predictions_page():
 @model_blueprint.route('/prediction')
 @login_required  # Limits access to authenticated users
 def prediction_page():
-    try:
+    # try:
         dict_id = request.args.get('dict')
         my_dict = Predictions.query.filter_by(id=dict_id).first()
         my_model = TrainedModel.query.filter_by(id=my_dict.model_id).first()
@@ -437,15 +437,15 @@ def prediction_page():
             variance=variance,
             sorted_variance=sorted_variance,
             examples=examples)
-    except Exception as e:
-        flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
-        error = ErrorLog()
-        error.user_id = current_user.id
-        error.error = str(e.__class__)
-        error.parameters = request.args
-        db.session.add(error)
-        db.session.commit()
-        return redirect(request.referrer)
+    # except Exception as e:
+    #     flash('Opps!  Something unexpected happened.  On the brightside, we logged the error and will absolutely look at it and work to correct it, ASAP.', 'error')
+    #     error = ErrorLog()
+    #     error.user_id = current_user.id
+    #     error.error = str(e.__class__)
+    #     error.parameters = request.args
+    #     db.session.add(error)
+    #     db.session.commit()
+    #     return redirect(request.referrer)
 
 @model_blueprint.route('/predictions_step1', methods=['GET', 'POST'])
 @login_required  # Limits access to authenticated users
